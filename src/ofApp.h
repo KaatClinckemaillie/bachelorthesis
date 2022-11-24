@@ -21,4 +21,8 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 		
+        ofSerial    serial;
+        string sensorValue;
+        int byteData;
+        int position = 0;
 };
