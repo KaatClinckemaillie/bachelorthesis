@@ -2,6 +2,16 @@
 
 #include "ofMain.h"
 
+class lightbol {
+    public:
+    int radius = 10;
+    int x = 550;
+    int y;
+    void draw();
+    lightbol(); //constructor
+    ~lightbol(); //destructor
+};
+
 class ofApp : public ofBaseApp{
 
 	public:
@@ -9,20 +19,11 @@ class ofApp : public ofBaseApp{
 		void update();
 		void draw();
 
-		void keyPressed(int key);
-		void keyReleased(int key);
-		void mouseMoved(int x, int y );
-		void mouseDragged(int x, int y, int button);
-		void mousePressed(int x, int y, int button);
-		void mouseReleased(int x, int y, int button);
-		void mouseEntered(int x, int y);
-		void mouseExited(int x, int y);
-		void windowResized(int w, int h);
-		void dragEvent(ofDragInfo dragInfo);
-		void gotMessage(ofMessage msg);
 		
         ofSerial    serial;
         string sensorValue;
         int byteData;
-        int position = 0;
+        int position = 50;
+        lightbol newLightbol;
+        
 };

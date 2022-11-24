@@ -15,83 +15,53 @@ void ofApp::setup(){
     //serial.setup("COM10", baud); // windows example
     //serial.setup("/dev/tty.usbserial-A4001JEC", baud); // mac osx example
     //serial.setup("/dev/ttyUSB0", baud); //linux example
+    //lightbol newLightbol;
+    
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
     //Simple if statement to inform user if Arduino is sending serial messages.
-        if (serial.available() < 0) {
-            sensorValue = "Arduino Error";
+    if (serial.available() < 0) {
+        sensorValue = "Arduino Error";
+    }
+    else {
+        //While statement looping through serial messages when serial is being provided.
+        while (serial.available() > 0) {
+            byteData = serial.readByte();
+            //position = byteData * 10;
         }
-        else {
-            //While statement looping through serial messages when serial is being provided.
-            while (serial.available() > 0) {
-                //byte data is being writen into byteData as int.
-                byteData = serial.readByte();
-                //position = byteData * 10;
-                //byteData is converted into a string for drawing later.
-                
-            }
-        }
-        cout << position << endl; // output the sensorValue
+    }
+    cout << position << endl; // output the sensorValue
+    
+    
+    newLightbol.x--;
+    
+    
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-
+    //ofDrawCircle(150, position, 50);
+    newLightbol.draw();
 }
 
 //--------------------------------------------------------------
-void ofApp::keyPressed(int key){
+lightbol::lightbol() {
+    //constructor
+    y = ofRandom(ofGetHeight());
+    
+};
 
+//--------------------------------------------------------------
+lightbol::~lightbol() {
+    //deconstructor
 }
 
 //--------------------------------------------------------------
-void ofApp::keyReleased(int key){
-
+void lightbol::draw(){
+    ofDrawCircle(x, y, radius);
 }
 
-//--------------------------------------------------------------
-void ofApp::mouseMoved(int x, int y ){
 
-}
 
-//--------------------------------------------------------------
-void ofApp::mouseDragged(int x, int y, int button){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::mousePressed(int x, int y, int button){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseReleased(int x, int y, int button){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseEntered(int x, int y){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseExited(int x, int y){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::windowResized(int w, int h){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::gotMessage(ofMessage msg){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::dragEvent(ofDragInfo dragInfo){ 
-
-}
