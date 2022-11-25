@@ -15,6 +15,7 @@ public:
     void keyReleased(int key);
     void keyPressed(int key);
     void update_lightbols();
+    void check_lightbols_collision();
     
     //game setup
     string game_state;

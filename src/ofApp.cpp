@@ -97,9 +97,17 @@ void ofApp::update_lightbols(){
         lightbols[i].update();
     }
     
-    //check lightbol collisions
+    check_lightbols_collision();
 }
 
+//--------------------------------------------------------------
+void ofApp::check_lightbols_collision() {
+    for (int i = 0; i < lightbols.size(); i++) {
+        if(lightbols[i].pos.x < 0){
+            lightbols.erase(lightbols.begin()+ i);
+        }
+    }
+}
 
 
 
