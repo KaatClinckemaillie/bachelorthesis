@@ -2,6 +2,7 @@
 
 #include "ofMain.h"
 #include "Lightbol.h"
+#include "Player.h"
 
 
 
@@ -28,9 +29,11 @@ public:
     int position = 50;
     
     vector <Lightbol> lightbols;
+    vector <Player> players;
     
     // colors of the sticks and bolls
     // yellow , green, blue, pink
     int colors[4][3] = {{245, 215, 64},{1, 157, 89},{20, 37, 234},{253, 175, 221}};
+    int x_positions[4] = {20, 60, 100, 140};
         
 };

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		835A99D52930D5EC007B2BE8 /* Lightbol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 835A99D42930D5EC007B2BE8 /* Lightbol.cpp */; };
+		835A99D82930F85D007B2BE8 /* Player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 835A99D72930F85D007B2BE8 /* Player.cpp */; };
 		E4B69E200A3A1BDC003C02F2 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E4B69E1D0A3A1BDC003C02F2 /* main.cpp */; };
 		E4B69E210A3A1BDC003C02F2 /* ofApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E4B69E1E0A3A1BDC003C02F2 /* ofApp.cpp */; };
 /* End PBXBuildFile section */
@@ -27,6 +28,8 @@
 /* Begin PBXFileReference section */
 		835A99D32930D5D8007B2BE8 /* Lightbol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Lightbol.h; sourceTree = "<group>"; };
 		835A99D42930D5EC007B2BE8 /* Lightbol.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Lightbol.cpp; sourceTree = "<group>"; };
+		835A99D62930F84E007B2BE8 /* Player.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Player.h; sourceTree = "<group>"; };
+		835A99D72930F85D007B2BE8 /* Player.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Player.cpp; sourceTree = "<group>"; };
 		E42962AC2163EDD300A6A9E2 /* ofCamera.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = ofCamera.cpp; path = ../../../libs/openFrameworks/3d/ofCamera.cpp; sourceTree = SOURCE_ROOT; };
 		E42962AD2163EDD300A6A9E2 /* ofMesh.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ofMesh.h; path = ../../../libs/openFrameworks/3d/ofMesh.h; sourceTree = SOURCE_ROOT; };
 		E42962AE2163EDD300A6A9E2 /* ofNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ofNode.h; path = ../../../libs/openFrameworks/3d/ofNode.h; sourceTree = SOURCE_ROOT; };
@@ -538,6 +541,8 @@
 				E4B69E1F0A3A1BDC003C02F2 /* ofApp.h */,
 				835A99D32930D5D8007B2BE8 /* Lightbol.h */,
 				835A99D42930D5EC007B2BE8 /* Lightbol.cpp */,
+				835A99D62930F84E007B2BE8 /* Player.h */,
+				835A99D72930F85D007B2BE8 /* Player.cpp */,
 			);
 			path = src;
 			sourceTree = SOURCE_ROOT;
@@ -640,6 +645,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				835A99D82930F85D007B2BE8 /* Player.cpp in Sources */,
 				E4B69E200A3A1BDC003C02F2 /* main.cpp in Sources */,
 				E4B69E210A3A1BDC003C02F2 /* ofApp.cpp in Sources */,
 				835A99D52930D5EC007B2BE8 /* Lightbol.cpp in Sources */,

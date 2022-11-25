@@ -19,6 +19,12 @@ void ofApp::setup(){
     game_state = "start";
     score = 0;
     
+    for(int i=0; i<4; i++){
+        Player p;
+        p.setup(colors[i][0],colors[i][1],colors[i][2], x_positions[i], (i+1) * 50, i);
+        players.push_back(p);
+    }
+    
     
 }
 
@@ -56,6 +62,9 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     //ofDrawCircle(150, position, 50);
+    for (int i = 0; i < players.size(); i++) {
+        players[i].draw();
+    }
     
     if (game_state == "start") {
         
