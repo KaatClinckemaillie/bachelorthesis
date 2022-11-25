@@ -15,12 +15,17 @@ void ofApp::setup(){
     //serial.setup("COM10", baud); // windows example
     //serial.setup("/dev/tty.usbserial-A4001JEC", baud); // mac osx example
     //serial.setup("/dev/ttyUSB0", baud); //linux example
-    //lightbol newLightbol;
+    
+    game_state = "start";
+    score = 0;
+    
     
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
+    
+    
     //Simple if statement to inform user if Arduino is sending serial messages.
     if (serial.available() < 0) {
         sensorValue = "Arduino Error";
@@ -32,10 +37,18 @@ void ofApp::update(){
             //position = byteData * 10;
         }
     }
-    cout << position << endl; // output the sensorValue
+    
+    if(game_state == "start"){
+        
+    }else if(game_state == "game") {
+        update_lightbols();
+        
+    }else if(game_state == "end") {
+        
+    }
     
     
-    newLightbol.x--;
+    
     
     
 }
@@ -43,25 +56,50 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     //ofDrawCircle(150, position, 50);
-    newLightbol.draw();
-}
-
-//--------------------------------------------------------------
-lightbol::lightbol() {
-    //constructor
-    y = ofRandom(ofGetHeight());
     
-};
+    if (game_state == "start") {
+        
+    } else if (game_state == "game") {
+        
+        for (int i = 0; i < lightbols.size(); i++) {
+            lightbols[i].draw();
+        }
+        
+    } else if (game_state == "end") {
 
-//--------------------------------------------------------------
-lightbol::~lightbol() {
-    //deconstructor
+    }
 }
 
 //--------------------------------------------------------------
-void lightbol::draw(){
-    ofDrawCircle(x, y, radius);
+void ofApp::keyReleased(int key){
+    if(game_state == "start"){
+        game_state = "game";
+    }else if(game_state == "game"){
+        // blank for now
+    }
 }
+
+//--------------------------------------------------------------
+void ofApp::keyPressed(int key){
+    if(game_state == "game"){
+        if(key == ' '){
+            Lightbol l;
+            int colorIndex = ofRandom(5)-1;
+            l.setup(colors[colorIndex][0],colors[colorIndex][1],colors[colorIndex][2] ,1, 550, ofRandom(ofGetHeight()), colorIndex);
+            lightbols.push_back(l);
+        }
+    }
+}
+
+//--------------------------------------------------------------
+void ofApp::update_lightbols(){
+    for (int i = 0; i < lightbols.size(); i++) {
+        lightbols[i].update();
+    }
+    
+    //check lightbol collisions
+}
+
 
 
 

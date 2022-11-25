@@ -1,29 +1,35 @@
 #pragma once
 
 #include "ofMain.h"
+#include "Lightbol.h"
 
-class lightbol {
-    public:
-    int radius = 10;
-    int x = 550;
-    int y;
-    void draw();
-    lightbol(); //constructor
-    ~lightbol(); //destructor
-};
+
 
 class ofApp : public ofBaseApp{
 
-	public:
-		void setup();
-		void update();
-		void draw();
-
-		
-        ofSerial    serial;
-        string sensorValue;
-        int byteData;
-        int position = 50;
-        lightbol newLightbol;
+	
+public:
+    void setup();
+    void update();
+    void draw();
+    void keyReleased(int key);
+    void keyPressed(int key);
+    void update_lightbols();
+    
+    //game setup
+    string game_state;
+    int score;
+        
+    // arduino
+    ofSerial    serial;
+    string sensorValue;
+    int byteData;
+    int position = 50;
+    
+    vector <Lightbol> lightbols;
+    
+    // colors of the sticks and bolls
+    // yellow , green, blue, pink
+    int colors[4][3] = {{245, 215, 64},{1, 157, 89},{20, 37, 234},{253, 175, 221}};
         
 };
