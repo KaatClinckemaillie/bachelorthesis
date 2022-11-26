@@ -27,6 +27,11 @@ void ofApp::setup(){
     
     
 }
+//--------------------------------------------------------------
+void ofApp::setupVideo(){
+    ofSetBackgroundColor(0);
+}
+
 
 //--------------------------------------------------------------
 void ofApp::update(){
@@ -69,12 +74,23 @@ void ofApp::draw(){
     if (game_state == "start") {
         
     } else if (game_state == "game") {
+        //draw score
         ofDrawBitmapString(ofToString(score), 500, 50);
         
         for (int i = 0; i < lightbols.size(); i++) {
             lightbols[i].draw();
         }
         
+    } else if (game_state == "end") {
+
+    }
+}
+//--------------------------------------------------------------
+void ofApp::drawVideo(ofEventArgs & args){
+    if (game_state == "start") {
+        ofDrawBitmapString("screen for start video", 100, 50);
+    } else if (game_state == "game") {
+    
     } else if (game_state == "end") {
 
     }
@@ -131,9 +147,13 @@ void ofApp::check_lightbols_collision() {
                     players[j].color.set(0,255,0);
                     lightbols.erase(lightbols.begin()+i);
                     score ++;
+                    catched_lightballs ++;
+                    //add light to ledstrip
                 }else {
                     players[j].color.set(255,0,0);
                     lightbols.erase(lightbols.begin()+i);
+                    catched_lightballs ++;
+                    //add light to ledstrip
                 }
                 
             }else{

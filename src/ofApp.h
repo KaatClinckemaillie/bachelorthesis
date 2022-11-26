@@ -11,8 +11,10 @@ class ofApp : public ofBaseApp{
 	
 public:
     void setup();
+    void setupVideo();
     void update();
     void draw();
+    void drawVideo(ofEventArgs & args);
     void keyReleased(int key);
     void keyPressed(int key);
     void update_lightbols();
@@ -21,6 +23,7 @@ public:
     //game setup
     string game_state;
     int score = 0;
+    int catched_lightballs = 0;
         
     // arduino
     ofSerial    serial;
