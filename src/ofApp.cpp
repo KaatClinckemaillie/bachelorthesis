@@ -69,6 +69,7 @@ void ofApp::draw(){
     if (game_state == "start") {
         
     } else if (game_state == "game") {
+        ofDrawBitmapString(ofToString(score), 500, 50);
         
         for (int i = 0; i < lightbols.size(); i++) {
             lightbols[i].draw();
@@ -114,6 +115,30 @@ void ofApp::check_lightbols_collision() {
     for (int i = 0; i < lightbols.size(); i++) {
         if(lightbols[i].pos.x < 0){
             lightbols.erase(lightbols.begin()+ i);
+        }
+        
+        
+        
+        for(int j=0; j< players.size(); j++){
+            
+            // check if player hits lightball
+            //nu wanneer 1/4 van de lichtbal samenvalt met een speler => gevangen!
+            if(lightbols[i].pos.x - lightbols[i].radius / 2  < players[j].pos.x + players[j].radius && lightbols[i].pos.x  + lightbols[i].radius / 2 > players[j].pos.x - players[j].radius && lightbols[i].pos.y - lightbols[i].radius / 2< players[j].pos.y + players[j].radius && lightbols[i].pos.y + lightbols[i].radius / 2 > players[j].pos.y - players[j].radius){
+                
+                
+                // check if color is equal (YES?: +++; NO?: ---;)
+                if(players[j].player_nr == lightbols[i].colorIndex){
+                    players[j].color.set(0,255,0);
+                    lightbols.erase(lightbols.begin()+i);
+                    score ++;
+                }else {
+                    players[j].color.set(255,0,0);
+                    lightbols.erase(lightbols.begin()+i);
+                }
+                
+            }else{
+                players[j].color.set(colors[j][0],colors[j][1],colors[j][2]);
+            }
         }
     }
 }
