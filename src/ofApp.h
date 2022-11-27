@@ -33,6 +33,7 @@ public:
     int speed = 10;
     int catched_lightballs = 0;
     float nextLightbolSeconds = 0;
+    int level;
         
     // arduino
     ofSerial    serial;
@@ -51,5 +52,7 @@ public:
     
     // hangt van de stokken van de tafel af
     int x_positions[4] = {30, 70, 110, 150};
+    
+    
         
 };

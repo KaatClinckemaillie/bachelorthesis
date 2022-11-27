@@ -4,6 +4,8 @@
 void ofApp::setup(){
     nulPos.x = (ofGetWidth() - width)/2;
     nulPos.y = (ofGetHeight()-height)/2;
+    
+    
 
     //ofSetFrameRate(60);
     
@@ -32,7 +34,6 @@ void ofApp::setup(){
     
     
     
-    
 }
 //--------------------------------------------------------------
 void ofApp::setupVideo(){
@@ -42,8 +43,12 @@ void ofApp::setupVideo(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
+
+    
     nulPos.x = (ofGetWidth() - width)/2;
-    nulPos.y = (ofGetHeight()-height)/2;
+    nulPos.y = (ofGetHeight() -height)/2;
+    
+    
     
     //Simple if statement to inform user if Arduino is sending serial messages.
     if (serial.available() < 0) {
@@ -65,7 +70,6 @@ void ofApp::update(){
         if(now > nextLightbolSeconds) {
             // do something here that should only happen every 5 seconds
             add_lightbol();
-            
             nextLightbolSeconds = now + speed;
         }
         
@@ -84,6 +88,7 @@ void ofApp::draw(){
     //ofDrawCircle(150, position, 50);
     ofSetColor(0);
     ofDrawRectangle(nulPos.x, nulPos.y, width, height);
+    
     for (int i = 0; i < players.size(); i++) {
         players[i].draw();
     }
@@ -91,16 +96,26 @@ void ofApp::draw(){
     
     
     
-    if (game_state == "start") {
+    if (game_state == "intro") {
         
-    } else if (game_state == "game") {
+    } else if(game_state=="start"){
+        ofDrawBitmapString("Pick your level", 500, 50);
         
-        
+    }else if (game_state == "game") {
         //draw score
         ofDrawBitmapString(ofToString(score), 500, 50);
+        ofDrawBitmapString(ofToString(level), 500, 500);
         
         for (int i = 0; i < lightbols.size(); i++) {
             lightbols[i].draw();
+        }
+        
+        if(level == 1){
+            
+        }else if(level == 2){
+            
+        }else if(level == 3){
+            
         }
         
     } else if (game_state == "end") {
@@ -121,7 +136,19 @@ void ofApp::drawVideo(ofEventArgs & args){
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
     if(game_state == "start"){
-        game_state = "game";
+        if(key == 'w'){
+            level = 1;
+            game_state = "game";
+        }
+        if(key == 'x'){
+            level = 2;
+            game_state = "game";
+        }
+        if(key == 'c'){
+            level = 3;
+            game_state = "game";
+        }
+        
     }else if(game_state == "game"){
         // blank for now
     }
@@ -129,13 +156,14 @@ void ofApp::keyReleased(int key){
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
+
     if(game_state == "game"){
-        if(key == ' '){
+        /*if(key == ' '){
             Lightbol l;
             int colorIndex = ofRandom(5)-1;
             l.setup(colors[colorIndex][0],colors[colorIndex][1],colors[colorIndex][2] ,1, 1, nulPos.x + width, ofRandom(nulPos.y ,nulPos.y + height), colorIndex);
             lightbols.push_back(l);
-        }
+        }*/
         
         if(key== 'a'){
             players[0].pos.y -= 5;
@@ -223,8 +251,12 @@ void ofApp::check_lightbols_collision() {
 
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h){
+
+    
     nulPos.x = (ofGetWidth() - width)/2;
     nulPos.y = (ofGetHeight()-height)/2;
+    
+    
     
     for (int i = 0; i < players.size(); i++) {
         players[i].pos.x = nulPos.x + x_positions[i];
