@@ -13,10 +13,10 @@ public:
     int radius = 10;
     ofPoint pos;
     ofColor color;
-    int speed;
+    ofPoint velo;
     int colorIndex;
     void draw();
     void update();
-    void setup(int r,int g,int b, int s, int x, int y,int colorI);
+    void setup(int r,int g,int b, int v_x, int v_y, int x, int y,int colorI);
     
 };

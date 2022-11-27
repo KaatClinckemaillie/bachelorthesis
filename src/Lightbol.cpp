@@ -7,17 +7,19 @@
 
 #include "Lightbol.h"
 
-void Lightbol::setup(int r,int g,int b, int s, int x, int y, int colorI){
+void Lightbol::setup(int r,int g,int b, int v_x, int v_y, int x, int y, int colorI){
     colorIndex = colorI;
     color.set(r, g , b);
     pos.x = x;
     pos.y = y;
-    speed = s + 3;
+    velo.x = v_x;
+    velo.y = v_y;
     
 }
 
 void Lightbol::update(){
-    pos.x -= speed;
+    pos.x -= velo.x;
+    pos.y += velo.y;
 }
 
 void Lightbol::draw(){

@@ -5,7 +5,10 @@
 //========================================================================
 int main( ){
     ofGLFWWindowSettings settings;
-    settings.setSize(600, 300);
+    
+    //size of laptop/beamer screen
+    //beamer: 1980 x 1080
+    settings.setSize(1024, 768);
     settings.setPosition(glm::vec2(300,0));
     settings.resizable = true;
     auto mainWindow = ofCreateWindow(settings);

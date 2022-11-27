@@ -2,6 +2,10 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+    nulPos.x = (ofGetWidth() - width)/2;
+    nulPos.y = (ofGetHeight()-height)/2;
+
+    //ofSetFrameRate(60);
     
     serial.listDevices();
     vector <ofSerialDeviceInfo> deviceList = serial.getDeviceList();
@@ -19,11 +23,14 @@ void ofApp::setup(){
     game_state = "start";
     score = 0;
     
+    
     for(int i=0; i<4; i++){
         Player p;
-        p.setup(colors[i][0],colors[i][1],colors[i][2], x_positions[i], (i+1) * 50, i);
+        p.setup(colors[i][0],colors[i][1],colors[i][2], nulPos.x + x_positions[i], nulPos.y + (i+1) * 50, i);
         players.push_back(p);
     }
+    
+    
     
     
 }
@@ -35,7 +42,8 @@ void ofApp::setupVideo(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
-    
+    nulPos.x = (ofGetWidth() - width)/2;
+    nulPos.y = (ofGetHeight()-height)/2;
     
     //Simple if statement to inform user if Arduino is sending serial messages.
     if (serial.available() < 0) {
@@ -53,6 +61,13 @@ void ofApp::update(){
         
     }else if(game_state == "game") {
         update_lightbols();
+        float now = ofGetElapsedTimef();
+        if(now > nextLightbolSeconds) {
+            // do something here that should only happen every 5 seconds
+            add_lightbol();
+            
+            nextLightbolSeconds = now + speed;
+        }
         
     }else if(game_state == "end") {
         
@@ -67,13 +82,20 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     //ofDrawCircle(150, position, 50);
+    ofSetColor(0);
+    ofDrawRectangle(nulPos.x, nulPos.y, width, height);
     for (int i = 0; i < players.size(); i++) {
         players[i].draw();
     }
     
+    
+    
+    
     if (game_state == "start") {
         
     } else if (game_state == "game") {
+        
+        
         //draw score
         ofDrawBitmapString(ofToString(score), 500, 50);
         
@@ -111,8 +133,33 @@ void ofApp::keyPressed(int key){
         if(key == ' '){
             Lightbol l;
             int colorIndex = ofRandom(5)-1;
-            l.setup(colors[colorIndex][0],colors[colorIndex][1],colors[colorIndex][2] ,1, 550, ofRandom(ofGetHeight()), colorIndex);
+            l.setup(colors[colorIndex][0],colors[colorIndex][1],colors[colorIndex][2] ,1, 1, nulPos.x + width, ofRandom(nulPos.y ,nulPos.y + height), colorIndex);
             lightbols.push_back(l);
+        }
+        
+        if(key== 'a'){
+            players[0].pos.y -= 5;
+        }
+        if(key== 'q'){
+            players[0].pos.y += 5;
+        }
+        if(key== 'z'){
+            players[1].pos.y -= 5;
+        }
+        if(key== 's'){
+            players[1].pos.y += 5;
+        }
+        if(key== 'e'){
+            players[2].pos.y -= 5;
+        }
+        if(key== 'd'){
+            players[2].pos.y += 5;
+        }
+        if(key== 'r'){
+            players[3].pos.y -= 5;
+        }
+        if(key== 'f'){
+            players[3].pos.y += 5;
         }
     }
 }
@@ -126,15 +173,26 @@ void ofApp::update_lightbols(){
     check_lightbols_collision();
 }
 
+
+
 //--------------------------------------------------------------
 void ofApp::check_lightbols_collision() {
     for (int i = 0; i < lightbols.size(); i++) {
-        if(lightbols[i].pos.x < 0){
-            lightbols.erase(lightbols.begin()+ i);
+        
+        //check borders
+        if(lightbols[i].pos.y > nulPos.y + height || lightbols[i].pos.y < nulPos.y){
+            lightbols[i].velo.y *= -1;
         }
         
         
         
+        //check out of screen
+        if(lightbols[i].pos.x < nulPos.x){
+            lightbols.erase(lightbols.begin()+ i);
+        }
+        
+        
+        // check hit
         for(int j=0; j< players.size(); j++){
             
             // check if player hits lightball
@@ -163,5 +221,23 @@ void ofApp::check_lightbols_collision() {
     }
 }
 
+//--------------------------------------------------------------
+void ofApp::windowResized(int w, int h){
+    nulPos.x = (ofGetWidth() - width)/2;
+    nulPos.y = (ofGetHeight()-height)/2;
+    
+    for (int i = 0; i < players.size(); i++) {
+        players[i].pos.x = nulPos.x + x_positions[i];
+        players[i].pos.y = nulPos.y + (i+1) * 50;
+    }
+}
+
+//--------------------------------------------------------------
+void ofApp::add_lightbol(){
+    Lightbol l;
+    int colorIndex = ofRandom(5)-1;
+    l.setup(colors[colorIndex][0],colors[colorIndex][1],colors[colorIndex][2] ,1, 1, nulPos.x + width, ofRandom(nulPos.y ,nulPos.y + height), colorIndex);
+    lightbols.push_back(l);
+}
 
 
