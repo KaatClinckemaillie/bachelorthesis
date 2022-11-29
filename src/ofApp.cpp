@@ -1,12 +1,14 @@
 #include "ofApp.h"
 
+
 //--------------------------------------------------------------
 void ofApp::setup(){
+
     nulPos.x = (ofGetWidth() - width)/2;
     nulPos.y = (ofGetHeight()-height)/2;
     
     
-
+    
     //ofSetFrameRate(60);
     
     serial.listDevices();
@@ -22,6 +24,9 @@ void ofApp::setup(){
     //serial.setup("/dev/tty.usbserial-A4001JEC", baud); // mac osx example
     //serial.setup("/dev/ttyUSB0", baud); //linux example
     
+ 
+    
+    
     game_state = "start";
     score = 0;
     
@@ -32,7 +37,8 @@ void ofApp::setup(){
         players.push_back(p);
     }
     
-    
+    bSendSerialMessage = true;
+    memset(bytesReadString, 0, 5);
     
 }
 //--------------------------------------------------------------
@@ -48,19 +54,29 @@ void ofApp::update(){
     nulPos.x = (ofGetWidth() - width)/2;
     nulPos.y = (ofGetHeight() -height)/2;
     
-    
-    
-    //Simple if statement to inform user if Arduino is sending serial messages.
-    if (serial.available() < 0) {
-        sensorValue = "Arduino Error";
+    serial.writeByte('a');
+
+    if(serial.available()){
+        unsigned char bytesReturned[4];
+        
+        memset(bytesReadString, 0, 5);
+        memset(bytesReturned, 0, 4);
+        
+        memcpy(bytesReadString, bytesReturned, 4);
+        serial.readBytes(bytesReturned, 4);
+        string serialData = (char*) bytesReturned;
+        positions = serialData;
+        serial.flush();
+        // I think this whole loop is to find the end of the string and stop listening
+        // Then when a new one starts in waits for it to finish
+        
+        
+        
     }
-    else {
-        //While statement looping through serial messages when serial is being provided.
-        while (serial.available() > 0) {
-            byteData = serial.readByte();
-            //position = byteData * 10;
-        }
-    }
+   
+
+    
+
     
     if(game_state == "start"){
         
@@ -89,12 +105,18 @@ void ofApp::draw(){
     ofSetColor(0);
     ofDrawRectangle(nulPos.x, nulPos.y, width, height);
     
+    
+    
+    ofDrawBitmapString(positions, 50, 100);
+    
     for (int i = 0; i < players.size(); i++) {
         players[i].draw();
     }
     
     
     
+    
+   
     
     if (game_state == "intro") {
         
@@ -152,6 +174,11 @@ void ofApp::keyReleased(int key){
     }else if(game_state == "game"){
         // blank for now
     }
+}
+
+//--------------------------------------------------------------
+void ofApp::mousePressed(int x, int y, int button){
+
 }
 
 //--------------------------------------------------------------
@@ -271,5 +298,4 @@ void ofApp::add_lightbol(){
     l.setup(colors[colorIndex][0],colors[colorIndex][1],colors[colorIndex][2] ,1, 1, nulPos.x + width, ofRandom(nulPos.y ,nulPos.y + height), colorIndex);
     lightbols.push_back(l);
 }
-
 

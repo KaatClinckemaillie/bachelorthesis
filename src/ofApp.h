@@ -3,7 +3,7 @@
 #include "ofMain.h"
 #include "Lightbol.h"
 #include "Player.h"
-#include "ofxBox2d.h"
+#include "ofxSimpleSerial.h"
 
 
 class ofApp : public ofBaseApp{
@@ -17,10 +17,12 @@ public:
     void drawVideo(ofEventArgs & args);
     void keyReleased(int key);
     void keyPressed(int key);
+    void mousePressed(int x, int y, int button);
     void windowResized(int w, int h);
     void update_lightbols();
     void check_lightbols_collision();
     void add_lightbol();
+
     
     
     
@@ -35,13 +37,25 @@ public:
     float nextLightbolSeconds = 0;
     int level;
         
+    
+    string positions;
+    
     // arduino
+    bool        bSendSerialMessage ;            // a flag for sending serial
+    char        bytesRead[4];                // data from serial, we will be trying to read 3
+    char        bytesReadString[5];            // a string needs a null terminator, so we need 3 + 1 bytes
+    int            nBytesRead;                    // how much did we read?
+    int            nTimesRead;                    // how many times did we read?
+    float        readTime;                    // when did we last read?
+    
     ofSerial    serial;
-    string sensorValue;
-    int byteData;
+
+            
+    
+    //char byteData[4];
     int position = 50;
     
-
+    vector <int> bytesData;
     
     vector <Lightbol> lightbols;
     vector <Player> players;
@@ -52,6 +66,7 @@ public:
     
     // hangt van de stokken van de tafel af
     int x_positions[4] = {30, 70, 110, 150};
+    int y_positions[4];
     
     
         
