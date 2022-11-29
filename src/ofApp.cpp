@@ -33,11 +33,10 @@ void ofApp::setup(){
     
     for(int i=0; i<4; i++){
         Player p;
-        p.setup(colors[i][0],colors[i][1],colors[i][2], nulPos.x + x_positions[i], nulPos.y + (i+1) * 50, i);
+        p.setup(colors[i][0],colors[i][1],colors[i][2], nulPos.x + x_positions[i], 20, i);
         players.push_back(p);
     }
     
-    bSendSerialMessage = true;
     memset(bytesReadString, 0, 5);
     
 }
@@ -66,6 +65,14 @@ void ofApp::update(){
         serial.readBytes(bytesReturned, 4);
         string serialData = (char*) bytesReturned;
         positions = serialData;
+        
+        firstCharacter= positions.substr(0, 2);
+        secondCharacter = positions.substr(2,2);
+
+        update_players();
+        
+        
+        
         serial.flush();
         // I think this whole loop is to find the end of the string and stop listening
         // Then when a new one starts in waits for it to finish
@@ -108,6 +115,10 @@ void ofApp::draw(){
     
     
     ofDrawBitmapString(positions, 50, 100);
+    ofDrawBitmapString(firstCharacter, 50, 120);
+    ofDrawBitmapString(secondCharacter, 50, 130);
+    ofDrawBitmapString(players[0].pos.y, 50, 200);
+    ofDrawBitmapString(players[1].pos.y, 50, 210);
     
     for (int i = 0; i < players.size(); i++) {
         players[i].draw();
@@ -228,7 +239,48 @@ void ofApp::update_lightbols(){
     check_lightbols_collision();
 }
 
+//--------------------------------------------------------------
+void ofApp::update_players(){
+    int marge = 20;
+    for (int i = 0; i < players.size(); i++) {
+        int num = floor((ofToInt(positions.substr(i * 2, 2)) * height)/ float(heightTable));
+        
+        // check if big difference, yes: change position, no: stay the same
+        // to avoid 'flickering'
+        if(num > players[i].pos.y + marge || num < players[i].pos.y - marge) {
+            players[i].pos.y = num;
+        }
+        
+    }
+                                
+}
 
+//--------------------------------------------------------------
+int ofApp::round_position(float num){
+    float dec,numcpy;
+    int n,last;
+    numcpy=num;
+    dec=num-floor(num);
+    num=numcpy;
+    n=floor(num);
+    if(n%10<5)
+    {
+        n=(n/10)*10;
+    }
+    else if(n%10==5)
+    {
+        if(dec>0)
+            n=(((n+10)/10)*10);
+        else
+            n=(n/10)*10;
+    }
+    else
+    {
+        n=(((n+10)/10)*10);
+    }
+    return n;
+
+};
 
 //--------------------------------------------------------------
 void ofApp::check_lightbols_collision() {
@@ -279,11 +331,8 @@ void ofApp::check_lightbols_collision() {
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h){
 
-    
     nulPos.x = (ofGetWidth() - width)/2;
     nulPos.y = (ofGetHeight()-height)/2;
-    
-    
     
     for (int i = 0; i < players.size(); i++) {
         players[i].pos.x = nulPos.x + x_positions[i];

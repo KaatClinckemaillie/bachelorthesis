@@ -19,6 +19,9 @@ int distance1; // variable for the distance measurement
 long duration2;
 int distance2;
 
+int heightTable = 40;
+int heightGame = 760;
+
 int testnumber;
 
 String number = "";
@@ -59,6 +62,7 @@ void loop() {
     digitalWrite(trigPin1, LOW);
     duration1 = pulseIn(echoPin1, HIGH);
     distance1 = (duration1/2) / 29.1;
+    
     
 
     if (distance1 >= 500 || distance1 <= 0){

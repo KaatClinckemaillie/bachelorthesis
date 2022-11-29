@@ -22,8 +22,14 @@ public:
     void update_lightbols();
     void check_lightbols_collision();
     void add_lightbol();
+    void update_players();
+    int round_position(float num);
 
     
+    
+    //technical setup
+    // OOK IN ARDUINO VERANDEREN!!!
+    int heightTable = 40;
     
     
     //game setup
@@ -38,17 +44,21 @@ public:
     int level;
         
     
-    string positions;
+    std::string positions;
+    std::string prev_positions;
     
     // arduino
-    bool        bSendSerialMessage ;            // a flag for sending serial
-    char        bytesRead[4];                // data from serial, we will be trying to read 3
-    char        bytesReadString[5];            // a string needs a null terminator, so we need 3 + 1 bytes
-    int            nBytesRead;                    // how much did we read?
-    int            nTimesRead;                    // how many times did we read?
-    float        readTime;                    // when did we last read?
+
+    char  bytesRead[4];  // data from serial, we will be trying to read 3
+    char bytesReadString[5]; // a string needs a null terminator, so we need 3 + 1 bytes
+    int nBytesRead; // how much did we read?
+    int nTimesRead; // how many times did we read?
+    float readTime; // when did we last read?
     
-    ofSerial    serial;
+    std::string firstCharacter;
+    std::string secondCharacter;
+    
+    ofSerial serial;
 
             
     
@@ -66,7 +76,8 @@ public:
     
     // hangt van de stokken van de tafel af
     int x_positions[4] = {30, 70, 110, 150};
-    int y_positions[4];
+    int y_positions[4] = {0,0,0,0};
+    int prev_y_positions[4] = {0,0,0,0};
     
     
         
