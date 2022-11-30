@@ -5,28 +5,16 @@
 void ofApp::setup(){
 
     nulPos.x = (ofGetWidth() - width)/2;
-    nulPos.y = (ofGetHeight()-height)/2;
-    
-    
+    nulPos.y = (ofGetHeight() - height)/2;
     
     //ofSetFrameRate(60);
     
     serial.listDevices();
     vector <ofSerialDeviceInfo> deviceList = serial.getDeviceList();
-        
-    // this should be set to whatever com port your serial device is connected to.
-    // (ie, COM4 on a pc, /dev/tty.... on linux, /dev/tty... on a mac)
-    // arduino users check in arduino app....
     int baud = 9600;
-    
     serial.setup(0, baud); //open the first device
-    //serial.setup("COM10", baud); // windows example
     //serial.setup("/dev/tty.usbserial-A4001JEC", baud); // mac osx example
-    //serial.setup("/dev/ttyUSB0", baud); //linux example
-    
- 
-    
-    
+
     game_state = "start";
     score = 0;
     
@@ -37,7 +25,7 @@ void ofApp::setup(){
         players.push_back(p);
     }
     
-    memset(bytesReadString, 0, 5);
+    memset(bytesReadString, 0, 9);
     
 }
 //--------------------------------------------------------------
@@ -56,29 +44,21 @@ void ofApp::update(){
     serial.writeByte('a');
 
     if(serial.available()){
-        unsigned char bytesReturned[4];
+        unsigned char bytesReturned[8];
         
-        memset(bytesReadString, 0, 5);
-        memset(bytesReturned, 0, 4);
+        memset(bytesReadString, 0, 9);
+        memset(bytesReturned, 0, 8);
         
-        memcpy(bytesReadString, bytesReturned, 4);
-        serial.readBytes(bytesReturned, 4);
+        memcpy(bytesReadString, bytesReturned, 8);
+        serial.readBytes(bytesReturned, 8);
         string serialData = (char*) bytesReturned;
         positions = serialData;
         
-        firstCharacter= positions.substr(0, 2);
-        secondCharacter = positions.substr(2,2);
+        //firstCharacter= positions.substr(0, 2);
+        //secondCharacter = positions.substr(2,2);
 
         update_players();
-        
-        
-        
         serial.flush();
-        // I think this whole loop is to find the end of the string and stop listening
-        // Then when a new one starts in waits for it to finish
-        
-        
-        
     }
    
 
@@ -88,14 +68,23 @@ void ofApp::update(){
     if(game_state == "start"){
         
     }else if(game_state == "game") {
-        update_lightbols();
-        float now = ofGetElapsedTimef();
-        if(now > nextLightbolSeconds) {
-            // do something here that should only happen every 5 seconds
-            add_lightbol();
-            nextLightbolSeconds = now + speed;
-        }
         
+        
+        if(level == 1){
+            
+            
+        }else if(level == 2){
+            float now = ofGetElapsedTimef();
+            if(now > nextLightbolSeconds) {
+                add_lightbol();
+                nextLightbolSeconds = now + speed_nextLightball;
+            }
+        }else if(level == 3) {
+            
+        }
+        update_lightbols();
+        
+
     }else if(game_state == "end") {
         
     }
@@ -137,7 +126,7 @@ void ofApp::draw(){
     }else if (game_state == "game") {
         //draw score
         ofDrawBitmapString(ofToString(score), 500, 50);
-        ofDrawBitmapString(ofToString(level), 500, 500);
+        ofDrawBitmapString(ofToString(catched_lightballs), 500, 60);
         
         for (int i = 0; i < lightbols.size(); i++) {
             lightbols[i].draw();
@@ -170,16 +159,22 @@ void ofApp::drawVideo(ofEventArgs & args){
 void ofApp::keyReleased(int key){
     if(game_state == "start"){
         if(key == 'w'){
-            level = 1;
+            game_mode = 1; //easy
+            setup_game();
             game_state = "game";
+            add_lightbol();
         }
         if(key == 'x'){
-            level = 2;
+            game_mode = 2; //medium
+            setup_game();
             game_state = "game";
+            add_lightbol();
         }
         if(key == 'c'){
-            level = 3;
+            game_mode = 3; // hard
+            setup_game();
             game_state = "game";
+            add_lightbol();
         }
         
     }else if(game_state == "game"){
@@ -202,31 +197,6 @@ void ofApp::keyPressed(int key){
             l.setup(colors[colorIndex][0],colors[colorIndex][1],colors[colorIndex][2] ,1, 1, nulPos.x + width, ofRandom(nulPos.y ,nulPos.y + height), colorIndex);
             lightbols.push_back(l);
         }*/
-        
-        if(key== 'a'){
-            players[0].pos.y -= 5;
-        }
-        if(key== 'q'){
-            players[0].pos.y += 5;
-        }
-        if(key== 'z'){
-            players[1].pos.y -= 5;
-        }
-        if(key== 's'){
-            players[1].pos.y += 5;
-        }
-        if(key== 'e'){
-            players[2].pos.y -= 5;
-        }
-        if(key== 'd'){
-            players[2].pos.y += 5;
-        }
-        if(key== 'r'){
-            players[3].pos.y -= 5;
-        }
-        if(key== 'f'){
-            players[3].pos.y += 5;
-        }
     }
 }
 
@@ -255,32 +225,6 @@ void ofApp::update_players(){
                                 
 }
 
-//--------------------------------------------------------------
-int ofApp::round_position(float num){
-    float dec,numcpy;
-    int n,last;
-    numcpy=num;
-    dec=num-floor(num);
-    num=numcpy;
-    n=floor(num);
-    if(n%10<5)
-    {
-        n=(n/10)*10;
-    }
-    else if(n%10==5)
-    {
-        if(dec>0)
-            n=(((n+10)/10)*10);
-        else
-            n=(n/10)*10;
-    }
-    else
-    {
-        n=(((n+10)/10)*10);
-    }
-    return n;
-
-};
 
 //--------------------------------------------------------------
 void ofApp::check_lightbols_collision() {
@@ -296,6 +240,7 @@ void ofApp::check_lightbols_collision() {
         //check out of screen
         if(lightbols[i].pos.x < nulPos.x){
             lightbols.erase(lightbols.begin()+ i);
+            add_lightbol();
         }
         
         
@@ -307,19 +252,24 @@ void ofApp::check_lightbols_collision() {
             if(lightbols[i].pos.x - lightbols[i].radius / 2  < players[j].pos.x + players[j].radius && lightbols[i].pos.x  + lightbols[i].radius / 2 > players[j].pos.x - players[j].radius && lightbols[i].pos.y - lightbols[i].radius / 2< players[j].pos.y + players[j].radius && lightbols[i].pos.y + lightbols[i].radius / 2 > players[j].pos.y - players[j].radius){
                 
                 
+                
                 // check if color is equal (YES?: +++; NO?: ---;)
                 if(players[j].player_nr == lightbols[i].colorIndex){
+                    // play happy animation
                     players[j].color.set(0,255,0);
                     lightbols.erase(lightbols.begin()+i);
                     score ++;
                     catched_lightballs ++;
                     //add light to ledstrip
                 }else {
+                    // play sad animation
                     players[j].color.set(255,0,0);
                     lightbols.erase(lightbols.begin()+i);
                     catched_lightballs ++;
                     //add light to ledstrip
                 }
+                add_lightbol();
+                update_level();
                 
             }else{
                 players[j].color.set(colors[j][0],colors[j][1],colors[j][2]);
@@ -348,3 +298,29 @@ void ofApp::add_lightbol(){
     lightbols.push_back(l);
 }
 
+//--------------------------------------------------------------
+void ofApp::setup_game(){
+    level = 1;
+    if(game_mode == 1){
+        speed_nextLightball = 10;
+    }else if(game_mode == 2){
+        speed_nextLightball = 20;
+        
+    }else if(game_mode == 3){
+        speed_nextLightball = 30;
+    }
+}
+
+//--------------------------------------------------------------
+void ofApp::update_level(){
+    
+    if(catched_lightballs >= 10 && catched_lightballs < 20){
+        level = 2;
+        
+    }else if(catched_lightballs >= 20 && catched_lightballs < 30){
+        level = 3;
+        
+    }else if(catched_lightballs == 30){
+        game_state = "end";
+    }
+}

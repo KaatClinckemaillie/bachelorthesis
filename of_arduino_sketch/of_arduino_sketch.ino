@@ -10,26 +10,27 @@
 #define trigPin1 3 //attach pin D3 Arduino to pin Trig of HC-SR04
 #define echoPin2 4
 #define trigPin2 5
-//#define echoPin3 6
-//#define trigPin3 7
+#define echoPin3 6
+#define trigPin3 7
+#define echoPin4 8
+#define trigPin4 9
 
 // defines variables
 long duration1; // variable for the duration of sound wave travel
 int distance1; // variable for the distance measurement
 long duration2;
 int distance2;
+long duration3;
+int distance3;
+long duration4;
+int distance4;
 
-int heightTable = 40;
-int heightGame = 760;
-
-int testnumber;
 
 String number = "";
 
-int positions[8];
 
-//long duration3;
-//int distance3;
+
+
 
 
 
@@ -41,8 +42,10 @@ void setup() {
   pinMode(echoPin1, INPUT);
   pinMode(trigPin2, OUTPUT);
   pinMode(echoPin2, INPUT);
-  //pinMode(trigPin3, OUTPUT);
-  //pinMode(echoPin3, INPUT);
+  pinMode(trigPin3, OUTPUT);
+  pinMode(echoPin3, INPUT);
+  pinMode(trigPin4, OUTPUT);
+  pinMode(echoPin4, INPUT);
 
   
 }
@@ -105,6 +108,50 @@ void loop() {
       }else {
         number += String(distance2);
 
+      }
+    }
+
+    long duration3, distance3;
+    digitalWrite(trigPin3, LOW);  // Added this line
+    delayMicroseconds(2); // Added this line
+    digitalWrite(trigPin3, HIGH);
+    delayMicroseconds(10); // Added this line
+    digitalWrite(trigPin3, LOW);
+    duration3 = pulseIn(echoPin3, HIGH);
+    distance3 = (duration3/2) / 29.1;
+
+    if (distance3 >= 500 || distance3 <= 0){
+      //Serial.println("99");
+      distance3 = 0;
+    }
+    else {
+      if(distance3 < 10) {
+        number += "0";
+        number += String(distance3);
+      }else {
+        number += String(distance3);
+      }
+    }
+
+    long duration4, distance4;
+    digitalWrite(trigPin4, LOW);  // Added this line
+    delayMicroseconds(2); // Added this line
+    digitalWrite(trigPin4, HIGH);
+    delayMicroseconds(10); // Added this line
+    digitalWrite(trigPin4, LOW);
+    duration4 = pulseIn(echoPin4, HIGH);
+    distance4 = (duration4/2) / 29.1;
+
+    if (distance4 >= 500 || distance4 <= 0){
+      //Serial.println("99");
+      distance4 = 0;
+    }
+    else {
+      if(distance4 < 10) {
+        number += "0";
+        number += String(distance4);
+      }else {
+        number += String(distance4);
       }
     }
       

@@ -3,7 +3,7 @@
 #include "ofMain.h"
 #include "Lightbol.h"
 #include "Player.h"
-#include "ofxSimpleSerial.h"
+
 
 
 class ofApp : public ofBaseApp{
@@ -24,6 +24,8 @@ public:
     void add_lightbol();
     void update_players();
     int round_position(float num);
+    void setup_game();
+    void update_level();
 
     
     
@@ -36,12 +38,13 @@ public:
     int width = 1220;
     int height = 760;
     ofPoint nulPos;
-    string game_state;
+    string game_state; // start game end
     int score = 0;
-    int speed = 10;
+    int speed_nextLightball;
     int catched_lightballs = 0;
     float nextLightbolSeconds = 0;
     int level;
+    int game_mode; //easy medium hard
         
     
     std::string positions;
@@ -49,11 +52,9 @@ public:
     
     // arduino
 
-    char  bytesRead[4];  // data from serial, we will be trying to read 3
-    char bytesReadString[5]; // a string needs a null terminator, so we need 3 + 1 bytes
-    int nBytesRead; // how much did we read?
-    int nTimesRead; // how many times did we read?
-    float readTime; // when did we last read?
+    char  bytesRead[8];  // data from serial, we will be trying to read 8
+    char bytesReadString[9]; // a string needs a null terminator, so we need 8 + 1 bytes
+
     
     std::string firstCharacter;
     std::string secondCharacter;
@@ -76,8 +77,6 @@ public:
     
     // hangt van de stokken van de tafel af
     int x_positions[4] = {30, 70, 110, 150};
-    int y_positions[4] = {0,0,0,0};
-    int prev_y_positions[4] = {0,0,0,0};
     
     
         
