@@ -1,22 +1,79 @@
 #include "ofApp.h"
 
+//--------------------------------------------------------------
+void ofApp::setupVideo(){
+    ofSetBackgroundColor(0);
+    ofSetVerticalSync(false);
+    
+    //load media
+    introMovie.load("movies/intro.mp4");
+    
+}
+
+
+//--------------------------------------------------------------
+void ofApp::updateVideo(ofEventArgs & args){
+    
+    if(game_state == "introVideo"){
+        introMovie.play();
+        introMovie.update();
+        
+        
+        
+        if(introMovie.getPosition() >= 0.99){
+            introMovie.stop();
+            introMovie.close();
+            game_state = "introGame";
+            
+        }
+    }
+}
+
+//--------------------------------------------------------------
+void ofApp::drawVideo(ofEventArgs & args){
+    ofSetColor(255);
+    ofDrawBitmapString(ofToString(game_state), 0, 400);
+    if (game_state == "start") {
+        ofDrawBitmapString("screen for start video", 100, 50);
+        
+    }else if (game_state == "introVideo") {
+        ofSetColor(255);
+        introMovie.draw(0, 0, 400, 300);
+        ofDrawBitmapString(ofToString(introMovie.getPosition()), 0, 450);
+        
+    } else if (game_state == "game") {
+    
+    } else if (game_state == "end") {
+
+    }
+}
+
+
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+    
+    //load media
+    introLightmanMovie.load("movies/introLightman.mp4");
+    countdownMovie.load("movies/countdown.mp4");
+    instructionMovie.load("movies/countdown.mp4");
+    
+    
 
-    nulPos.x = (ofGetWidth() - width)/2;
-    nulPos.y = (ofGetHeight() - height)/2;
-    
-    //ofSetFrameRate(60);
-    
+    // connect with arduino
     serial.listDevices();
     vector <ofSerialDeviceInfo> deviceList = serial.getDeviceList();
     int baud = 9600;
     serial.setup(0, baud); //open the first device
     //serial.setup("/dev/tty.usbserial-A4001JEC", baud); // mac osx example
 
+    //setup game
+    nulPos.x = (ofGetWidth() - width)/2;
+    nulPos.y = (ofGetHeight() - height)/2;
     game_state = "start";
     score = 0;
+    
+    
     
     
     for(int i=0; i<4; i++){
@@ -28,10 +85,7 @@ void ofApp::setup(){
     memset(bytesReadString, 0, 9);
     
 }
-//--------------------------------------------------------------
-void ofApp::setupVideo(){
-    ofSetBackgroundColor(0);
-}
+
 
 
 //--------------------------------------------------------------
@@ -67,6 +121,55 @@ void ofApp::update(){
     
     if(game_state == "start"){
         
+    }else if(game_state=="introVideo"){
+        
+        
+    }else if(game_state=="introGame"){
+        introLightmanMovie.play();
+        introLightmanMovie.update();
+        
+        if(introLightmanMovie.getPosition() >= 0.99){
+            introLightmanMovie.stop();
+            introLightmanMovie.close();
+            game_state = "instructions";
+            
+        }
+        
+        
+    }else if(game_state=="instructions"){
+        instructionMovie.play();
+        instructionMovie.update();
+        
+        
+        
+        if(instructionMovie.getPosition() >= 0.9){
+            countdownMovie.play();
+        }
+        
+        
+        
+        if(countdownMovie.isPlaying()){
+            countdownMovie.update();
+            if(countdownMovie.getPosition() >= 0.9){
+                instructionMovie.stop();
+                countdownMovie.stop();
+                instructionMovie.close();
+                countdownMovie.close();
+                game_state = "game";
+                
+                
+                // eerste lichtbol heel traag en animatie bij de bal
+                // die geraakt moet worden, zodat duidelijk is
+                // wat moet gebeuren
+                //add_lightbol();
+                
+                Lightbol firstLightbol;
+                int colorIndex = 0;
+                firstLightbol.setup(colors[colorIndex][0],colors[colorIndex][1],colors[colorIndex][2] ,1, 0, nulPos.x + width, (nulPos.y + height)/2, colorIndex);
+                lightbols.push_back(firstLightbol);
+            }
+        }
+
     }else if(game_state == "game") {
         
         
@@ -95,6 +198,8 @@ void ofApp::update(){
     
 }
 
+
+
 //--------------------------------------------------------------
 void ofApp::draw(){
     //ofDrawCircle(150, position, 50);
@@ -114,14 +219,22 @@ void ofApp::draw(){
     }
     
     
-    
-    
-   
-    
-    if (game_state == "intro") {
-        
-    } else if(game_state=="start"){
+    if(game_state=="start"){
         ofDrawBitmapString("Pick your level", 500, 50);
+        
+    }else if (game_state == "introGame") {
+        ofSetColor(255);
+        introLightmanMovie.draw(0, 0, 400, 300);
+    }else if (game_state == "instructions") {
+        ofSetColor(255);
+        
+        instructionMovie.draw(0, 0, 400, 300);
+        
+        ofDrawBitmapString(ofToString(instructionMovie.getPosition()), 0, 450);
+        
+        if(countdownMovie.isPlaying()){
+            countdownMovie.draw(1000, 0, 400, 300);
+        }
         
     }else if (game_state == "game") {
         //draw score
@@ -143,42 +256,42 @@ void ofApp::draw(){
     } else if (game_state == "end") {
 
     }
-}
-//--------------------------------------------------------------
-void ofApp::drawVideo(ofEventArgs & args){
-    if (game_state == "start") {
-        ofDrawBitmapString("screen for start video", 100, 50);
-    } else if (game_state == "game") {
     
-    } else if (game_state == "end") {
-
-    }
+    
 }
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
     if(game_state == "start"){
-        if(key == 'w'){
+        if(key == 'e'){
             game_mode = 1; //easy
             setup_game();
-            game_state = "game";
-            add_lightbol();
+            game_state = "introVideo";
+            playVideo = true;
+            
         }
-        if(key == 'x'){
+        if(key == 'm'){
             game_mode = 2; //medium
             setup_game();
-            game_state = "game";
-            add_lightbol();
+            game_state = "introVideo";
         }
-        if(key == 'c'){
+        if(key == 'h'){
             game_mode = 3; // hard
             setup_game();
-            game_state = "game";
-            add_lightbol();
+            game_state = "introVideo";
         }
         
-    }else if(game_state == "game"){
-        // blank for now
+    }else if(game_state == "introVideo"){
+        if(key == 's'){
+            introMovie.close();
+            game_state = "introGame";
+        }
+    }else if(game_state == "introGame"){
+        if(key == 's'){
+            introLightmanMovie.close();
+            game_state = "instructions";
+        }
+        
     }
 }
 

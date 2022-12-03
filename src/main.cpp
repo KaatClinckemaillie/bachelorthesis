@@ -23,6 +23,7 @@ int main( ){
     auto mainApp = make_shared<ofApp>();
     mainApp-> setupVideo();
     ofAddListener(videoWindow->events().draw, mainApp.get(), &ofApp::drawVideo);
+    ofAddListener(videoWindow->events().update,mainApp.get(), &ofApp::updateVideo);
     
     //ofAddListener(guiWindow->events().draw,mainApp.get(),&ofApp::drawGui);
     ofRunApp(mainWindow, mainApp);
