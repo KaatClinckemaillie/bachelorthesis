@@ -13,6 +13,7 @@ void Player::setup(int r,int g,int b,int x, int y, int nr){
     color.set(r, g , b);
     pos.x = x;
     pos.y = y;
+    ofSetCircleResolution(100);
 }
 
 void Player::update(){
@@ -21,5 +22,6 @@ void Player::update(){
 
 void Player::draw(){
     ofSetColor(color);
+    
     ofDrawCircle(pos.x, pos.y, radius);
 }

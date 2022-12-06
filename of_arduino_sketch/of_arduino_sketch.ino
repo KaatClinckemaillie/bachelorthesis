@@ -25,6 +25,9 @@ int distance3;
 long duration4;
 int distance4;
 
+int relay1 = 14;
+int relay2 = 15;
+
 
 String number = "";
 
@@ -46,6 +49,8 @@ void setup() {
   pinMode(echoPin3, INPUT);
   pinMode(trigPin4, OUTPUT);
   pinMode(echoPin4, INPUT);
+  pinMode(relay1, OUTPUT);
+  pinMode(relay2, OUTPUT);
 
   
 }
@@ -54,9 +59,21 @@ void loop() {
 
   char inByte = 0;
 
+  digitalWrite(relay1, HIGH);
+  digitalWrite(relay2, HIGH);
+
   //if(Serial.available() > 0){
     // get incoming byte:
     inByte = Serial.read();
+
+    // light on Level 1
+    if(inByte == 'a'){
+      digitalWrite(relay1, LOW);
+    }
+
+    if(inByte == 'b') {
+      digitalWrite(relay2, LOW);
+    }
 
     digitalWrite(trigPin1, LOW);  // Added this line
     delayMicroseconds(2); // Added this line

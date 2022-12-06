@@ -36,8 +36,8 @@ public:
     
     
     //game setup
-    int width = 1220;
-    int height = 680;
+    int width = 1920;
+    int height = 1080;
     ofPoint nulPos;
     string game_state; // start introVideo introGame instructions game end outro restart
     
@@ -89,7 +89,7 @@ public:
     int colors[4][3] = {{245, 215, 64},{1, 157, 89},{20, 37, 234},{253, 175, 221}};
     
     // hangt van de stokken van de tafel af
-    int x_positions[4] = {50, 250, 450, 650};
+    int x_positions[4] = {151, 453, 755, 1057};
     
     
         

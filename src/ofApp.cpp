@@ -3,7 +3,7 @@
 //--------------------------------------------------------------
 void ofApp::setupVideo(){
     ofSetBackgroundColor(0);
-    ofSetVerticalSync(false);
+    ofSetVerticalSync(true);
     
     //load media
     introMovie.load("movies/intro.mp4");
@@ -33,6 +33,7 @@ void ofApp::updateVideo(ofEventArgs & args){
 void ofApp::drawVideo(ofEventArgs & args){
     ofSetColor(255);
     ofDrawBitmapString(ofToString(game_state), 0, 400);
+    
     if (game_state == "start") {
         ofDrawBitmapString("screen for start video", 100, 50);
         
@@ -52,12 +53,13 @@ void ofApp::drawVideo(ofEventArgs & args){
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    
+    ofSetLogLevel(OF_LOG_VERBOSE);
     //load media
     introLightmanMovie.load("movies/introLightman.mp4");
     countdownMovie.load("movies/countdown.mp4");
     instructionMovie.load("movies/countdown.mp4");
     
+    arrow.load("images/arrow.png");
     
 
     // connect with arduino
@@ -95,7 +97,6 @@ void ofApp::update(){
     nulPos.x = (ofGetWidth() - width)/2;
     nulPos.y = (ofGetHeight() -height)/2;
     
-    serial.writeByte('a');
 
     if(serial.available()){
         unsigned char bytesReturned[8];
@@ -161,19 +162,27 @@ void ofApp::update(){
                 // eerste lichtbol heel traag en animatie bij de bal
                 // die geraakt moet worden, zodat duidelijk is
                 // wat moet gebeuren
-                //add_lightbol();
+                add_lightbol();
+
                 
-                Lightbol firstLightbol;
-                int colorIndex = 0;
-                firstLightbol.setup(colors[colorIndex][0],colors[colorIndex][1],colors[colorIndex][2] ,1, 0, nulPos.x + width, (nulPos.y + height)/2, colorIndex);
-                lightbols.push_back(firstLightbol);
+                
             }
         }
 
     }else if(game_state == "game") {
         
+        if(catched_lightballs == 0){
+            // show arrow at right position
+            
+        }
+        
         
         if(level == 1){
+            if(catched_lightballs == 10) {
+                // start animation
+                
+                level == 2;
+            }
             
             
         }else if(level == 2){
@@ -207,30 +216,21 @@ void ofApp::draw(){
     ofDrawRectangle(nulPos.x, nulPos.y, width, height);
     
     
-    
-    ofDrawBitmapString(positions, 50, 100);
-    ofDrawBitmapString(firstCharacter, 50, 120);
-    ofDrawBitmapString(secondCharacter, 50, 130);
-    ofDrawBitmapString(players[0].pos.y, 50, 200);
-    ofDrawBitmapString(players[1].pos.y, 50, 210);
-    
     for (int i = 0; i < players.size(); i++) {
         players[i].draw();
     }
     
     
     if(game_state=="start"){
-        ofDrawBitmapString("Pick your level", 500, 50);
+        ofDrawBitmapString("Pick your level", 500, 500);
         
     }else if (game_state == "introGame") {
         ofSetColor(255);
         introLightmanMovie.draw(0, 0, 400, 300);
     }else if (game_state == "instructions") {
         ofSetColor(255);
-        
         instructionMovie.draw(0, 0, 400, 300);
         
-        ofDrawBitmapString(ofToString(instructionMovie.getPosition()), 0, 450);
         
         if(countdownMovie.isPlaying()){
             countdownMovie.draw(1000, 0, 400, 300);
@@ -240,6 +240,7 @@ void ofApp::draw(){
         //draw score
         ofDrawBitmapString(ofToString(score), 500, 50);
         ofDrawBitmapString(ofToString(catched_lightballs), 500, 60);
+        ofDrawBitmapString(ofToString(level), 1400, 60);
         
         for (int i = 0; i < lightbols.size(); i++) {
             lightbols[i].draw();
@@ -310,6 +311,31 @@ void ofApp::keyPressed(int key){
             l.setup(colors[colorIndex][0],colors[colorIndex][1],colors[colorIndex][2] ,1, 1, nulPos.x + width, ofRandom(nulPos.y ,nulPos.y + height), colorIndex);
             lightbols.push_back(l);
         }*/
+        
+        if(key == 'a'){
+            players[0].pos.y -= 10;
+        }
+        if(key == 'q'){
+            players[0].pos.y += 10;
+        }
+        if(key == 'z'){
+            players[1].pos.y -= 10;
+        }
+        if(key == 's'){
+            players[1].pos.y += 10;
+        }
+        if(key == 'e'){
+            players[2].pos.y -= 10;
+        }
+        if(key == 'd'){
+            players[2].pos.y += 10;
+        }
+        if(key == 'r'){
+            players[3].pos.y -= 10;
+        }
+        if(key == 'f'){
+            players[3].pos.y += 10;
+        }
     }
 }
 
@@ -353,7 +379,9 @@ void ofApp::check_lightbols_collision() {
         //check out of screen
         if(lightbols[i].pos.x < nulPos.x){
             lightbols.erase(lightbols.begin()+ i);
-            add_lightbol();
+            if(catched_lightballs <= 9){
+                add_lightbol();
+            }
         }
         
         
@@ -373,15 +401,23 @@ void ofApp::check_lightbols_collision() {
                     lightbols.erase(lightbols.begin()+i);
                     score ++;
                     catched_lightballs ++;
+                    if(catched_lightballs <= 9){
+                        add_lightbol();
+                    }
                     //add light to ledstrip
                 }else {
                     // play sad animation
                     players[j].color.set(255,0,0);
                     lightbols.erase(lightbols.begin()+i);
                     catched_lightballs ++;
+                    
+                    if(catched_lightballs <= 9){
+                        add_lightbol();
+                    }
+                    
                     //add light to ledstrip
                 }
-                add_lightbol();
+                
                 update_level();
                 
             }else{
@@ -407,30 +443,56 @@ void ofApp::windowResized(int w, int h){
 void ofApp::add_lightbol(){
     Lightbol l;
     int colorIndex = ofRandom(5)-1;
-    l.setup(colors[colorIndex][0],colors[colorIndex][1],colors[colorIndex][2] ,1, 1, nulPos.x + width, ofRandom(nulPos.y ,nulPos.y + height), colorIndex);
-    lightbols.push_back(l);
+    
+    if(catched_lightballs == 0){
+        
+        Lightbol firstLightbol;
+        colorIndex = 0;
+        firstLightbol.setup(colors[colorIndex][0],colors[colorIndex][1],colors[colorIndex][2] ,300, 0, nulPos.x + width, (nulPos.y + height)/2, colorIndex);
+        lightbols.push_back(firstLightbol);
+        
+        
+    }else if(catched_lightballs <= 5){
+        
+        l.setup(colors[colorIndex][0],colors[colorIndex][1],colors[colorIndex][2] ,300, 0, nulPos.x + width, ofRandom(nulPos.y ,nulPos.y + height), colorIndex);
+        lightbols.push_back(l);
+        
+        
+    }else if(catched_lightballs > 5){
+        
+        l.setup(colors[colorIndex][0],colors[colorIndex][1],colors[colorIndex][2] ,300, 1, nulPos.x + width, ofRandom(nulPos.y ,nulPos.y + height), colorIndex);
+        lightbols.push_back(l);
+    }
 }
 
 //--------------------------------------------------------------
 void ofApp::setup_game(){
     level = 1;
     if(game_mode == 1){
-        speed_nextLightball = 10;
+        // snelheid lichtballen
+        
+        speed_nextLightball =3;
     }else if(game_mode == 2){
-        speed_nextLightball = 20;
+        // snelheid lichtballen
+        
+        speed_nextLightball = 5;
         
     }else if(game_mode == 3){
-        speed_nextLightball = 30;
+        // snelheid lichtballen
+        
+        speed_nextLightball = 3;
     }
 }
 
 //--------------------------------------------------------------
 void ofApp::update_level(){
     
-    if(catched_lightballs >= 10 && catched_lightballs < 20){
+    if(catched_lightballs == 10){
+        serial.writeByte('a');
         level = 2;
         
-    }else if(catched_lightballs >= 20 && catched_lightballs < 30){
+    }else if(catched_lightballs == 20){
+        serial.writeByte('b');
         level = 3;
         
     }else if(catched_lightballs == 30){

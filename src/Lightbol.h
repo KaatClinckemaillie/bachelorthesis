@@ -10,7 +10,7 @@
 
 class Lightbol {
 public:
-    int radius = 10;
+    int radius = 30;
     ofPoint pos;
     ofColor color;
     ofPoint velo;

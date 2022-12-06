@@ -11,7 +11,7 @@
 
 class Player {
 public:
-    int radius = 20;
+    int radius = 80;
     ofPoint pos;
     ofColor color;
     int player_nr;

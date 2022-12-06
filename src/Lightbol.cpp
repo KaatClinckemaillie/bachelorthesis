@@ -18,11 +18,11 @@ void Lightbol::setup(int r,int g,int b, int v_x, int v_y, int x, int y, int colo
 }
 
 void Lightbol::update(){
-    pos.x -= velo.x;
-    pos.y += velo.y;
+    pos.x -= ofGetLastFrameTime() * velo.x;
+    pos.y += ofGetLastFrameTime() * velo.y;
 }
 
 void Lightbol::draw(){
     ofSetColor(color);
-    ofDrawCircle(pos.x, pos.y, 10);
+    ofDrawCircle(pos.x, pos.y, radius);
 }
