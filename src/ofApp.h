@@ -21,6 +21,7 @@ public:
     void keyPressed(int key);
     void mousePressed(int x, int y, int button);
     void windowResized(int w, int h);
+    
     void update_lightbols();
     void check_lightbols_collision();
     void add_lightbol();
@@ -28,6 +29,10 @@ public:
     int round_position(float num);
     void setup_game();
     void update_level();
+    void draw_lightman();
+    void update_lightman();
+    void stop_lightmanMovies();
+    void reset_game();
 
     
     
@@ -39,7 +44,7 @@ public:
     int width = 1920;
     int height = 1080;
     ofPoint nulPos;
-    string game_state; // start introVideo introGame instructions game end outro restart
+    string game_state; // start introVideo introGame countdown game end outro restart
     
     int score = 0;
     int speed_nextLightball;
@@ -48,6 +53,8 @@ public:
     float nextLightbolSeconds = 0;
     int level;
     int game_mode; //easy medium hard
+    string state_lightman = "neutral"; // neutral happy sad;
+    
     
     //media
     //video
@@ -56,6 +63,9 @@ public:
     ofVideoPlayer countdownMovie;
     ofVideoPlayer introLightmanMovie;
     ofVideoPlayer instructionMovie;
+    ofVideoPlayer happyLightmanMovie;
+    ofVideoPlayer sadLightmanMovie;
+    ofVideoPlayer neutralLightmanMovie;
     //img
     ofImage arrow;
 

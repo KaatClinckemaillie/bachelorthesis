@@ -13,7 +13,7 @@ int main( ){
     settings.resizable = true;
     auto mainWindow = ofCreateWindow(settings);
     
-    settings.setSize(300,300);
+    settings.setSize(1024,768);
     settings.setPosition(glm::vec2(0,0));
     settings.resizable = true;
     

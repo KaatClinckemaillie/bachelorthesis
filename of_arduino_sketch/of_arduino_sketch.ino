@@ -32,6 +32,8 @@ int relay2 = 15;
 String number = "";
 
 
+int level = 1;
+
 
 
 
@@ -66,13 +68,18 @@ void loop() {
     // get incoming byte:
     inByte = Serial.read();
 
-    // light on Level 1
+    // light on => Level 2
     if(inByte == 'a'){
-      digitalWrite(relay1, LOW);
+      level = 2;
+      //digitalWrite(relay1, LOW);
     }
 
     if(inByte == 'b') {
       digitalWrite(relay2, LOW);
+    }
+
+    if(level == 2){
+      digitalWrite(relay1, LOW);
     }
 
     digitalWrite(trigPin1, LOW);  // Added this line

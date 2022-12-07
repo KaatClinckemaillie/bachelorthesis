@@ -32,15 +32,13 @@ void ofApp::updateVideo(ofEventArgs & args){
 //--------------------------------------------------------------
 void ofApp::drawVideo(ofEventArgs & args){
     ofSetColor(255);
-    ofDrawBitmapString(ofToString(game_state), 0, 400);
     
     if (game_state == "start") {
-        ofDrawBitmapString("screen for start video", 100, 50);
+        ofDrawBitmapString("screen for video", 100, 50);
         
     }else if (game_state == "introVideo") {
         ofSetColor(255);
-        introMovie.draw(0, 0, 400, 300);
-        ofDrawBitmapString(ofToString(introMovie.getPosition()), 0, 450);
+        introMovie.draw(0, 0, 1200, 900);
         
     } else if (game_state == "game") {
     
@@ -54,12 +52,19 @@ void ofApp::drawVideo(ofEventArgs & args){
 //--------------------------------------------------------------
 void ofApp::setup(){
     ofSetLogLevel(OF_LOG_VERBOSE);
+    ofSetLogLevel(OF_LOG_ERROR);
     //load media
     introLightmanMovie.load("movies/introLightman.mp4");
     countdownMovie.load("movies/countdown.mp4");
     instructionMovie.load("movies/countdown.mp4");
     
+    neutralLightmanMovie.load("movies/neutralLightman.mp4");
+    sadLightmanMovie.load("movies/sadLightman.mp4");
+    happyLightmanMovie.load("movies/happyLightman.mp4");
+    
     arrow.load("images/arrow.png");
+    
+
     
 
     // connect with arduino
@@ -97,6 +102,7 @@ void ofApp::update(){
     nulPos.x = (ofGetWidth() - width)/2;
     nulPos.y = (ofGetHeight() -height)/2;
     
+    
 
     if(serial.available()){
         unsigned char bytesReturned[8];
@@ -132,44 +138,35 @@ void ofApp::update(){
         if(introLightmanMovie.getPosition() >= 0.99){
             introLightmanMovie.stop();
             introLightmanMovie.close();
-            game_state = "instructions";
+            game_state = "countdown";
             
         }
         
         
-    }else if(game_state=="instructions"){
-        instructionMovie.play();
-        instructionMovie.update();
+    }else if(game_state=="countdown"){
         
+        countdownMovie.play();
+        countdownMovie.update();
         
-        
-        if(instructionMovie.getPosition() >= 0.9){
-            countdownMovie.play();
+        if(countdownMovie.getPosition() >= 0.9){
+            countdownMovie.stop();
+            countdownMovie.close();
+            
+            neutralLightmanMovie.play();
+            
+            game_state = "game";
+            
+            
+            // eerste lichtbol heel traag en animatie bij de bal
+            // die geraakt moet worden, zodat duidelijk is
+            // wat moet gebeuren
+            add_lightbol();
         }
-        
-        
-        
-        if(countdownMovie.isPlaying()){
-            countdownMovie.update();
-            if(countdownMovie.getPosition() >= 0.9){
-                instructionMovie.stop();
-                countdownMovie.stop();
-                instructionMovie.close();
-                countdownMovie.close();
-                game_state = "game";
-                
-                
-                // eerste lichtbol heel traag en animatie bij de bal
-                // die geraakt moet worden, zodat duidelijk is
-                // wat moet gebeuren
-                add_lightbol();
 
-                
-                
-            }
-        }
 
     }else if(game_state == "game") {
+        
+        update_lightman();
         
         if(catched_lightballs == 0){
             // show arrow at right position
@@ -192,7 +189,17 @@ void ofApp::update(){
                 nextLightbolSeconds = now + speed_nextLightball;
             }
         }else if(level == 3) {
-            
+            if(score > 30){
+                float now = ofGetElapsedTimef();
+                if(now > nextLightbolSeconds) {
+                    add_lightbol();
+                    nextLightbolSeconds = now + speed_nextLightball;
+                }
+            }else if(score >= 30){
+                // stop all the lightman video's
+                
+                game_state == "end";
+            }
         }
         update_lightbols();
         
@@ -222,25 +229,28 @@ void ofApp::draw(){
     
     
     if(game_state=="start"){
-        ofDrawBitmapString("Pick your level", 500, 500);
+        ofDrawBitmapString("Pick your level", 1000, 500);
         
     }else if (game_state == "introGame") {
         ofSetColor(255);
-        introLightmanMovie.draw(0, 0, 400, 300);
-    }else if (game_state == "instructions") {
+        introLightmanMovie.draw(width/2 + nulPos.x, 0, width/2, width/2);
+    }else if (game_state == "countdown") {
         ofSetColor(255);
-        instructionMovie.draw(0, 0, 400, 300);
         
-        
-        if(countdownMovie.isPlaying()){
-            countdownMovie.draw(1000, 0, 400, 300);
-        }
+        countdownMovie.draw(width/2 + nulPos.x, nulPos.y, 800, 800);
         
     }else if (game_state == "game") {
         //draw score
-        ofDrawBitmapString(ofToString(score), 500, 50);
-        ofDrawBitmapString(ofToString(catched_lightballs), 500, 60);
-        ofDrawBitmapString(ofToString(level), 1400, 60);
+        ofDrawBitmapString("Score:",1500, 50);
+        ofDrawBitmapString(ofToString(score), 1550, 50);
+        ofDrawBitmapString("Catched lightballs:",1500, 70);
+        ofDrawBitmapString(ofToString(catched_lightballs),1750, 70);
+        ofDrawBitmapString("Level:",1500, 80);
+        ofDrawBitmapString(ofToString(level), 1550, 80);
+        
+        
+        //draw lightman
+        draw_lightman();
         
         for (int i = 0; i < lightbols.size(); i++) {
             lightbols[i].draw();
@@ -290,7 +300,7 @@ void ofApp::keyReleased(int key){
     }else if(game_state == "introGame"){
         if(key == 's'){
             introLightmanMovie.close();
-            game_state = "instructions";
+            game_state = "countdown";
         }
         
     }
@@ -336,7 +346,37 @@ void ofApp::keyPressed(int key){
         if(key == 'f'){
             players[3].pos.y += 10;
         }
+        
+        if(key == 'm'){
+            reset_game();
+            
+            
+        }
     }
+}
+
+//--------------------------------------------------------------
+void ofApp::reset_game(){
+    score = 0;
+    catched_lightballs = 0;
+    throwed_lightballs = 0;
+    nextLightbolSeconds = 0;
+    game_mode = 0;
+    state_lightman = "neutral";
+    
+    
+    //load media
+    introMovie.load("movies/intro.mp4");
+    
+    introLightmanMovie.load("movies/introLightman.mp4");
+    countdownMovie.load("movies/countdown.mp4");
+    instructionMovie.load("movies/countdown.mp4");
+    
+    neutralLightmanMovie.load("movies/neutralLightman.mp4");
+    sadLightmanMovie.load("movies/sadLightman.mp4");
+    happyLightmanMovie.load("movies/happyLightman.mp4");
+    
+    game_state = "start";
 }
 
 //--------------------------------------------------------------
@@ -350,7 +390,7 @@ void ofApp::update_lightbols(){
 
 //--------------------------------------------------------------
 void ofApp::update_players(){
-    int marge = 20;
+    int marge = 40;
     for (int i = 0; i < players.size(); i++) {
         int num = floor((ofToInt(positions.substr(i * 2, 2)) * height)/ float(heightTable));
         
@@ -396,19 +436,36 @@ void ofApp::check_lightbols_collision() {
                 
                 // check if color is equal (YES?: +++; NO?: ---;)
                 if(players[j].player_nr == lightbols[i].colorIndex){
-                    // play happy animation
+                    
+                    // set lightman happy
+                    state_lightman = "happy";
+                    
+                    // give positive feedback to player
                     players[j].color.set(0,255,0);
+                    
+                    //delete lightbol
                     lightbols.erase(lightbols.begin()+i);
+                    
+                    // add score
                     score ++;
                     catched_lightballs ++;
+                    
+                    // if still level 1, add lightbol
                     if(catched_lightballs <= 9){
                         add_lightbol();
                     }
                     //add light to ledstrip
                 }else {
-                    // play sad animation
+                    // set lightman sad
+                    //state_lightman = "sad";
+                    
+                    // give negative feedback to player
                     players[j].color.set(255,0,0);
+                    
+                    // delete lighboll
                     lightbols.erase(lightbols.begin()+i);
+                    
+                    //update score
                     catched_lightballs ++;
                     
                     if(catched_lightballs <= 9){
@@ -497,5 +554,119 @@ void ofApp::update_level(){
         
     }else if(catched_lightballs == 30){
         game_state = "end";
+    }
+}
+
+//--------------------------------------------------------------
+
+void ofApp::update_lightman(){
+    
+    if(neutralLightmanMovie.isPlaying()){
+        neutralLightmanMovie.update();
+    }
+    
+    if(state_lightman == "happy"){
+        neutralLightmanMovie.setPaused(true);
+        neutralLightmanMovie.setPosition(0.01);
+        
+        happyLightmanMovie.play();
+        state_lightman = "neutral";
+    }
+    
+    if(happyLightmanMovie.isPlaying()){
+        happyLightmanMovie.update();
+        
+        if(happyLightmanMovie.getPosition() >= 0.9){
+            happyLightmanMovie.setPosition(0.01);
+            happyLightmanMovie.setPaused(true);
+            
+            neutralLightmanMovie.setPaused(false);
+        }
+    }
+    
+    // if state is changes, stop other lightman video's and play correct state video
+    
+    /*
+    if(state_lightman == "happy"){
+        stop_lightmanMovies();
+        happyLightmanMovie.play();
+    }
+    
+    if(state_lightman == "sad"){
+     stop_lightmanMovies();
+     sadLightmanMovie.play();
+     }
+    
+    if(happyLightmanMovie.isPlaying()){
+        happyLightmanMovie.update();
+        if(happyLightmanMovie.getPosition() >= 0.95){
+            happyLightmanMovie.stop();
+            happyLightmanMovie.close();
+            
+            neutralLightmanMovie.play();
+        }
+    }else if(sadLightmanMovie.isPlaying()){
+      sadLightmanMovie.update();
+      if(sadLightmanMovie.getPosition() >= 0.95){
+      sadLightmanMovie.stop();
+      sadLightmanMovie.close();
+      
+      neutralLightmanMovie.play();
+      }
+    //}
+    else {
+        neutralLightmanMovie.update();
+    }
+    
+    state_lightman = "neutral";
+      */
+}
+
+//--------------------------------------------------------------
+
+void ofApp::draw_lightman(){
+    int sizeVideo = 200;
+    
+    if(neutralLightmanMovie.isPlaying()){
+        ofSetColor(255);
+        neutralLightmanMovie.draw(width - sizeVideo + nulPos.x, nulPos.y, sizeVideo, sizeVideo);
+    }
+    
+    if(happyLightmanMovie.isPlaying()){
+        ofSetColor(255);
+        happyLightmanMovie.draw(width - sizeVideo + nulPos.x, nulPos.y, sizeVideo, sizeVideo);
+    }
+    
+    /*
+    int sizeVideo = 100;
+    
+    if(neutralLightmanMovie.isPlaying()){
+        neutralLightmanMovie.draw(width - sizeVideo + nulPos.x, nulPos.y, sizeVideo, sizeVideo);
+        
+    }else if(happyLightmanMovie.isPlaying()){
+        happyLightmanMovie.draw(width - sizeVideo + nulPos.x, nulPos.y, sizeVideo, sizeVideo);
+        
+    }else if(sadLightmanMovie.isPlaying()){
+        sadLightmanMovie.draw(width - sizeVideo + nulPos.x, nulPos.y, sizeVideo, sizeVideo);
+    }
+     */
+    
+}
+
+//--------------------------------------------------------------
+void ofApp:: stop_lightmanMovies(){
+    if(happyLightmanMovie.isPlaying()){
+        happyLightmanMovie.stop();
+        happyLightmanMovie.close();
+    }
+    
+    if(sadLightmanMovie.isPlaying()){
+        sadLightmanMovie.stop();
+        sadLightmanMovie.close();
+    }
+    
+    if(neutralLightmanMovie.isPlaying()){
+        neutralLightmanMovie.stop();
+        neutralLightmanMovie.close();
     }
 }
