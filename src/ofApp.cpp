@@ -457,7 +457,7 @@ void ofApp::check_lightbols_collision() {
                     //add light to ledstrip
                 }else {
                     // set lightman sad
-                    //state_lightman = "sad";
+                    state_lightman = "sad";
                     
                     // give negative feedback to player
                     players[j].color.set(255,0,0);
@@ -566,10 +566,33 @@ void ofApp::update_lightman(){
     }
     
     if(state_lightman == "happy"){
-        neutralLightmanMovie.setPaused(true);
-        neutralLightmanMovie.setPosition(0.01);
+        
+        if(sadLightmanMovie.isPlaying()){
+            sadLightmanMovie.setPaused(true);
+            sadLightmanMovie.setPosition(0.01);
+        }else{
+            neutralLightmanMovie.setPaused(true);
+            neutralLightmanMovie.setPosition(0.01);
+        }
         
         happyLightmanMovie.play();
+        state_lightman = "neutral";
+    }
+    
+    if(state_lightman == "sad"){
+        
+        if(happyLightmanMovie.isPlaying()){
+            happyLightmanMovie.setPaused(true);
+            happyLightmanMovie.setPosition(0.01);
+        }else{
+            neutralLightmanMovie.setPaused(true);
+            neutralLightmanMovie.setPosition(0.01);
+        }
+        
+        
+        
+        
+        sadLightmanMovie.play();
         state_lightman = "neutral";
     }
     
@@ -579,6 +602,17 @@ void ofApp::update_lightman(){
         if(happyLightmanMovie.getPosition() >= 0.9){
             happyLightmanMovie.setPosition(0.01);
             happyLightmanMovie.setPaused(true);
+            
+            neutralLightmanMovie.setPaused(false);
+        }
+    }
+    
+    if(sadLightmanMovie.isPlaying()){
+        sadLightmanMovie.update();
+        
+        if(sadLightmanMovie.getPosition() >= 0.9){
+            sadLightmanMovie.setPosition(0.01);
+            sadLightmanMovie.setPaused(true);
             
             neutralLightmanMovie.setPaused(false);
         }
@@ -635,6 +669,11 @@ void ofApp::draw_lightman(){
     if(happyLightmanMovie.isPlaying()){
         ofSetColor(255);
         happyLightmanMovie.draw(width - sizeVideo + nulPos.x, nulPos.y, sizeVideo, sizeVideo);
+    }
+    
+    if(sadLightmanMovie.isPlaying()){
+        ofSetColor(255);
+        sadLightmanMovie.draw(width - sizeVideo + nulPos.x, nulPos.y, sizeVideo, sizeVideo);
     }
     
     /*
