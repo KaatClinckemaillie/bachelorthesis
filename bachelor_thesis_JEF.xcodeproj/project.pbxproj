@@ -9,6 +9,144 @@
 		<string>46</string>
 		<key>objects</key>
 		<dict>
+			<key>5F060DF0BE4A3E14E1161981</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>ofxSimpleSerial.h</string>
+				<key>path</key>
+				<string>../../../addons/ofxSimpleSerial/src/ofxSimpleSerial.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>52413AD708FABC6DBE18EA93</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>379C327B5137D5DF940BDBB0</string>
+					<string>5F060DF0BE4A3E14E1161981</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>src</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
+			<key>30CFBB86EC7BF2803432D264</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>52413AD708FABC6DBE18EA93</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>ofxSimpleSerial</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
+			<key>DCC00AF0AF749598D84DF9D7</key>
+			<dict>
+				<key>fileRef</key>
+				<string>379C327B5137D5DF940BDBB0</string>
+				<key>isa</key>
+				<string>PBXBuildFile</string>
+			</dict>
+			<key>379C327B5137D5DF940BDBB0</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.cpp.cpp</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>ofxSimpleSerial.cpp</string>
+				<key>path</key>
+				<string>../../../addons/ofxSimpleSerial/src/ofxSimpleSerial.cpp</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>0B6B883E0809EA9D7895B702</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>Lightbol.h</string>
+				<key>path</key>
+				<string>src/Lightbol.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>A837538A506CA52AF2214190</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>Player.h</string>
+				<key>path</key>
+				<string>src/Player.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>CB70B178311B16CC26AC0B3E</key>
+			<dict>
+				<key>fileRef</key>
+				<string>A7B46A3AD8E3B2B2B99C0D3D</string>
+				<key>isa</key>
+				<string>PBXBuildFile</string>
+			</dict>
+			<key>A7B46A3AD8E3B2B2B99C0D3D</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.cpp.cpp</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>Player.cpp</string>
+				<key>path</key>
+				<string>src/Player.cpp</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>B488AA19A5B56BC7F073C534</key>
+			<dict>
+				<key>fileRef</key>
+				<string>CEF1812513F7F64BF37FB8B0</string>
+				<key>isa</key>
+				<string>PBXBuildFile</string>
+			</dict>
+			<key>CEF1812513F7F64BF37FB8B0</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.cpp.cpp</string>
+				<key>fileEncoding</key>
+				<string>4</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>Lightbol.cpp</string>
+				<key>path</key>
+				<string>src/Lightbol.cpp</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
 			<key>6948EE371B920CB800B5AC1A</key>
 			<dict>
 				<key>children</key>
@@ -176,6 +314,8 @@ fi
 					<array>
 						<string>$(OF_CORE_HEADERS)</string>
 						<string>src</string>
+						<string>src</string>
+						<string>../../../addons/ofxSimpleSerial/src</string>
 					</array>
 					<key>MACOSX_DEPLOYMENT_TARGET</key>
 					<string>10.9</string>
@@ -217,6 +357,8 @@ fi
 					<array>
 						<string>$(OF_CORE_HEADERS)</string>
 						<string>src</string>
+						<string>src</string>
+						<string>../../../addons/ofxSimpleSerial/src</string>
 					</array>
 					<key>ICON</key>
 					<string>$(ICON_NAME_RELEASE)</string>
@@ -251,7 +393,9 @@ fi
 			<key>BB4B014C10F69532006C3DED</key>
 			<dict>
 				<key>children</key>
-				<array />
+				<array>
+					<string>30CFBB86EC7BF2803432D264</string>
+				</array>
 				<key>isa</key>
 				<string>PBXGroup</string>
 				<key>name</key>
@@ -3016,6 +3160,8 @@ fi
 					<array>
 						<string>$(OF_CORE_HEADERS)</string>
 						<string>src</string>
+						<string>src</string>
+						<string>../../../addons/ofxSimpleSerial/src</string>
 					</array>
 					<key>MACOSX_DEPLOYMENT_TARGET</key>
 					<string>10.9</string>
@@ -3077,6 +3223,8 @@ fi
 					<array>
 						<string>$(OF_CORE_HEADERS)</string>
 						<string>src</string>
+						<string>src</string>
+						<string>../../../addons/ofxSimpleSerial/src</string>
 					</array>
 					<key>MACOSX_DEPLOYMENT_TARGET</key>
 					<string>10.9</string>
@@ -3102,6 +3250,9 @@ fi
 				<array>
 					<string>E4B69E200A3A1BDC003C02F2</string>
 					<string>E4B69E210A3A1BDC003C02F2</string>
+					<string>B488AA19A5B56BC7F073C534</string>
+					<string>CB70B178311B16CC26AC0B3E</string>
+					<string>DCC00AF0AF749598D84DF9D7</string>
 				</array>
 				<key>isa</key>
 				<string>PBXSourcesBuildPhase</string>
@@ -3201,6 +3352,8 @@ fi
 					<array>
 						<string>$(OF_CORE_HEADERS)</string>
 						<string>src</string>
+						<string>src</string>
+						<string>../../../addons/ofxSimpleSerial/src</string>
 					</array>
 					<key>ICON</key>
 					<string>$(ICON_NAME_DEBUG)</string>
@@ -3252,6 +3405,8 @@ fi
 					<array>
 						<string>$(OF_CORE_HEADERS)</string>
 						<string>src</string>
+						<string>src</string>
+						<string>../../../addons/ofxSimpleSerial/src</string>
 					</array>
 					<key>ICON</key>
 					<string>$(ICON_NAME_RELEASE)</string>
@@ -3290,6 +3445,10 @@ fi
 					<string>E4B69E1D0A3A1BDC003C02F2</string>
 					<string>E4B69E1E0A3A1BDC003C02F2</string>
 					<string>E4B69E1F0A3A1BDC003C02F2</string>
+					<string>CEF1812513F7F64BF37FB8B0</string>
+					<string>A7B46A3AD8E3B2B2B99C0D3D</string>
+					<string>A837538A506CA52AF2214190</string>
+					<string>0B6B883E0809EA9D7895B702</string>
 				</array>
 				<key>isa</key>
 				<string>PBXGroup</string>
