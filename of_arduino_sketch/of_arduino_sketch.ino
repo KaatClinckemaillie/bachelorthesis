@@ -1,10 +1,14 @@
-// ---------------------------------------------------------------- //
-// Arduino Ultrasoninc Sensor HC-SR04
-// Re-writed by Arbi Abdul Jabbaar
-// Using Arduino IDE 1.8.7
-// Using HC-SR04 Module
-// Tested on 17 September 2019
-// ---------------------------------------------------------------- //
+#include <FastLED.h>
+
+#define NUM_LEDS 30
+#define LED_PIN 10
+#define BRIGHTNESS  50
+#define LED_TYPE    WS2812B
+#define COLOR_ORDER GRB
+
+CRGB leds[NUM_LEDS];
+
+
 
 #define echoPin1 2 // attach pin D2 Arduino to pin Echo of HC-SR04
 #define trigPin1 3 //attach pin D3 Arduino to pin Trig of HC-SR04
@@ -14,6 +18,9 @@
 #define trigPin3 7
 #define echoPin4 8
 #define trigPin4 9
+
+int relay1 = 14;
+int relay2 = 15;
 
 // defines variables
 long duration1; // variable for the duration of sound wave travel
@@ -25,21 +32,13 @@ int distance3;
 long duration4;
 int distance4;
 
-int relay1 = 14;
-int relay2 = 15;
 
+
+int score;
 
 String number = "";
 
-
-int level = 1;
-
-
-
-
-
-
-
+int level;
 
 void setup() {
   Serial.begin (9600);
@@ -51,35 +50,71 @@ void setup() {
   pinMode(echoPin3, INPUT);
   pinMode(trigPin4, OUTPUT);
   pinMode(echoPin4, INPUT);
+
   pinMode(relay1, OUTPUT);
   pinMode(relay2, OUTPUT);
 
-  
+  FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS);
+  FastLED.setBrightness(  BRIGHTNESS );
+  score = 0;
+  level = 1;
+
 }
 void loop() {
   long duration1, distance1;
 
   char inByte = 0;
 
-  digitalWrite(relay1, HIGH);
-  digitalWrite(relay2, HIGH);
-
-  //if(Serial.available() > 0){
+  ////if(Serial.available() > 0){
     // get incoming byte:
     inByte = Serial.read();
 
-    // light on => Level 2
+    // level up 1->2
     if(inByte == 'a'){
       level = 2;
-      //digitalWrite(relay1, LOW);
     }
 
+    // level up 2->3
     if(inByte == 'b') {
-      digitalWrite(relay2, LOW);
+      level = 3;
+    }
+
+    // reset
+    if(inByte == 'c') {
+      level = 1;
+      score = 0;
+      for(int i=0; i< 30; i++){
+        leds[i] = CRGB::Black;
+      }
+      FastLED.show();
+    }
+
+    // score 
+    if(inByte == 'd'){
+      leds[score] = CRGB::Green;
+      score ++;
+      FastLED.show();
+    }
+
+    // mismatch
+    if(inByte == 'e'){
+      leds[score] = CRGB::Red;   
+      score ++; 
+      FastLED.show();
     }
 
     if(level == 2){
       digitalWrite(relay1, LOW);
+    }
+
+    if(level == 3){
+      digitalWrite(relay1, LOW);
+      digitalWrite(relay2, LOW);
+    }
+
+    if(level == 1){
+      digitalWrite(relay2, HIGH);
+      digitalWrite(relay1, HIGH);
     }
 
     digitalWrite(trigPin1, LOW);  // Added this line
@@ -90,25 +125,15 @@ void loop() {
     duration1 = pulseIn(echoPin1, HIGH);
     distance1 = (duration1/2) / 29.1;
     
-    
-
     if (distance1 >= 500 || distance1 <= 0){
-      //Serial.print("99");
-      //Serial.print(",");
-      number += "00";
-      
-    }
-    else {
-      //Serial.print(distance1); 
-      //Serial.print(",");  
+      number += "00";     
+    } else { 
       if(distance1 < 10) {
         number += "0";
         number += String(distance1);
       }else {
         number += String(distance1);
       }
-      
-      
     }
 
     
@@ -180,33 +205,9 @@ void loop() {
     }
       
     Serial.println(number);
+    
     number = "";
-    //Serial.println(String("43452"));
     Serial.flush(); 
 
-//}
-  
-  
-  
-  
-
-/*  long duration3, distance3;
-  digitalWrite(trigPin3, LOW);  // Added this line
-  delayMicroseconds(2); // Added this line
-  digitalWrite(trigPin3, HIGH);
-  delayMicroseconds(10); // Added this line
-  digitalWrite(trigPin3, LOW);
-  duration3 = pulseIn(echoPin3, HIGH);
-  distance3= (duration3/2) / 29.1;
-
-   if (distance3 >= 500 || distance3 <= 0){
-    Serial.println("Out of range");
-  }
-  else {
-    Serial.print("Sensor3  ");
-    Serial.print(distance3);
-    Serial.println("cm");
-  }
-  delay(1000); */
-  
+//}  
 }

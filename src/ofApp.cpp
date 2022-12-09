@@ -407,6 +407,7 @@ void ofApp::windowResized(int w, int h){
 
 //--------------------------------------------------------------
 void ofApp::reset_game(){
+    serial.writeByte('c');
     score = 0;
     catched_lightballs = 0;
     throwed_lightballs = 0;
@@ -487,7 +488,7 @@ void ofApp::update_players(){
         // check if big difference, yes: change position, no: stay the same
         // to avoid 'flickering'
         if(num > players[i].pos.y + marge || num < players[i].pos.y - marge) {
-            players[i].pos.y = num;
+            players[i].pos.y = num + nulPos.y;
         }
         
     }
@@ -500,7 +501,7 @@ void ofApp::check_lightballs_collision() {
     for (int i = 0; i < lightballs.size(); i++) {
         
         //check borders
-        if(lightballs[i].pos.y > nulPos.y + height || lightballs[i].pos.y < nulPos.y){
+        if(lightballs[i].pos.y + lightballs[i].radius > nulPos.y + height || lightballs[i].pos.y - lightballs[i].radius < nulPos.y){
             lightballs[i].velo.y *= -1;
         }
         

@@ -38,7 +38,7 @@ public:
     
     
     //technical setup
-    int heightTable = 40;
+    int heightTable = 38;
     
     
     //game setup
