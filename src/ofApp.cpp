@@ -41,8 +41,13 @@ void ofApp::updateVideo(ofEventArgs & args){
         
         if(level == 3){
             flicker1Movie.close();
+            game_state = "game";
         }
-    }
+     }else if(game_state == "outro"){
+         // video outro
+         
+         // if done? show score
+     }
         
         if(level == 3){
             flicker1Movie.close();
@@ -74,8 +79,7 @@ void ofApp::drawVideo(ofEventArgs & args){
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    ofSetLogLevel(OF_LOG_VERBOSE);
-    ofSetLogLevel(OF_LOG_ERROR);
+
     //load media
     introLightmanMovie.load("movies/introLightman.mp4");
     countdownMovie.load("movies/countdown.mp4");
@@ -113,7 +117,7 @@ void ofApp::setup(){
         players.push_back(p);
     }
     
-    memset(bytesReadString, 0, 9);
+    memset(bytesReadString, 0, 7);
     
 }
 
@@ -129,20 +133,21 @@ void ofApp::update(){
     
 
     if(serial.available()){
-        unsigned char bytesReturned[8];
+        unsigned char bytesReturned[6];
         
-        memset(bytesReadString, 0, 9);
-        memset(bytesReturned, 0, 8);
+        memset(bytesReadString, 0, 7);
+        memset(bytesReturned, 0, 6);
         
-        memcpy(bytesReadString, bytesReturned, 8);
-        serial.readBytes(bytesReturned, 8);
+        memcpy(bytesReadString, bytesReturned, 6);
+        serial.readBytes(bytesReturned, 6);
         string serialData = (char*) bytesReturned;
         positions = serialData;
+
+
+        //update_players();
         
         //firstCharacter= positions.substr(0, 2);
         //secondCharacter = positions.substr(2,2);
-
-        update_players();
         serial.flush();
     }
    
@@ -204,6 +209,8 @@ void ofApp::update(){
             }
             
             
+            
+            
         }else if(level == 2){
             float now = ofGetElapsedTimef();
             if(now > nextLightballSeconds) {
@@ -213,26 +220,36 @@ void ofApp::update(){
             
             
         }else if(level == 3) {
-            if(score > 30){
+            if(score < 30){
                 float now = ofGetElapsedTimef();
                 if(now > nextLightballSeconds) {
                     add_lightball();
                     nextLightballSeconds = now + speed_nextLightball;
                 }
-            
+                update_opacity();
             
             
             }else if(score >= 30){
+                opacity = 0;
                 // stop all the lightman video's
                 
                 game_state == "end";
             }
+            
+            
         }
         update_lightballs();
         
 
     }else if(game_state == "end") {
+        // play animation of happy lightman, confetti party
+        // animation done? play outro
         
+        
+    }else if(game_state == "score"){
+        // display score for 10 sec
+        
+        //restart
     }
     
     
@@ -249,6 +266,12 @@ void ofApp::draw(){
     ofSetColor(0);
     ofDrawRectangle(nulPos.x, nulPos.y, width, height);
     
+    
+    ofDrawBitmapString(positions, 50, 100);
+    //ofDrawBitmapString(firstCharacter, 50, 120);
+    //ofDrawBitmapString(secondCharacter, 50, 130);
+    //ofDrawBitmapString(players[0].pos.y, 50, 200);
+    //ofDrawBitmapString(players[1].pos.y, 50, 210);
     
     
     
@@ -287,10 +310,14 @@ void ofApp::draw(){
         
         if(level == 1){
             
+            
         }else if(level == 2){
             
         }else if(level == 3){
-            
+            ofEnableAlphaBlending();
+            ofSetColor(0,0,0,opacity);
+            ofDrawRectangle(nulPos.x, nulPos.y, width, height);
+            ofDisableAlphaBlending();
         }
         
     } else if (game_state == "levelUp") {
@@ -299,6 +326,8 @@ void ofApp::draw(){
         int size_y = 862;
         levelUpImg.draw(width + nulPos.x - 600 , nulPos.y + height/2 - size_y/2, size_x, size_y);
     }
+    
+    
     
     for (int i = 0; i < players.size(); i++) {
         players[i].draw();
@@ -414,6 +443,7 @@ void ofApp::reset_game(){
     nextLightballSeconds = 0;
     game_mode = 0;
     state_lightman = "neutral";
+    lightballs.clear();
     
     
     //load media
@@ -446,6 +476,7 @@ void ofApp::update_lightballs(){
 void ofApp::add_lightball(){
     Lightball l;
     int colorIndex = ofRandom(5)-1;
+    int marge = 50;
     
     // first ball with instructions
     if(catched_lightballs == 0){
@@ -458,13 +489,13 @@ void ofApp::add_lightball(){
         
     }else if(catched_lightballs < 5){
         
-        l.setup(colors[colorIndex][0],colors[colorIndex][1],colors[colorIndex][2] ,speed_lightballs, 0, nulPos.x + width, ofRandom(nulPos.y ,nulPos.y + height), colorIndex);
+        l.setup(colors[colorIndex][0],colors[colorIndex][1],colors[colorIndex][2] ,speed_lightballs, 0, nulPos.x + width, ofRandom(nulPos.y +  marge ,nulPos.y + height - marge), colorIndex);
         lightballs.push_back(l);
         
         
     }else if(catched_lightballs >= 5){
         
-        l.setup(colors[colorIndex][0],colors[colorIndex][1],colors[colorIndex][2] ,speed_lightballs,ofRandom(150), nulPos.x + width, ofRandom(nulPos.y ,nulPos.y + height), colorIndex);
+        l.setup(colors[colorIndex][0],colors[colorIndex][1],colors[colorIndex][2] ,speed_lightballs,ofRandom(150), nulPos.x + width, ofRandom(nulPos.y +  marge ,nulPos.y + height - marge), colorIndex);
         lightballs.push_back(l);
     }
 }
@@ -488,7 +519,16 @@ void ofApp::update_players(){
         // check if big difference, yes: change position, no: stay the same
         // to avoid 'flickering'
         if(num > players[i].pos.y + marge || num < players[i].pos.y - marge) {
-            players[i].pos.y = num + nulPos.y;
+            int newPosition = num + nulPos.y;
+            
+            if(newPosition + players[i].radius > nulPos.y + height ){
+                players[i].pos.y = nulPos.y + height - players[i].radius;
+            }else if(newPosition - players[i].radius < nulPos.y){
+                players[i].pos.y = nulPos.y + players[i].radius;
+            }else{
+                players[i].pos.y = newPosition;
+            }
+            
         }
         
     }
@@ -523,55 +563,65 @@ void ofApp::check_lightballs_collision() {
             //nu wanneer 1/4 van de lichtbal samenvalt met een speler => gevangen!
             if(lightballs[i].pos.x - lightballs[i].radius / 2  < players[j].pos.x + players[j].radius && lightballs[i].pos.x  + lightballs[i].radius / 2 > players[j].pos.x - players[j].radius && lightballs[i].pos.y - lightballs[i].radius / 2< players[j].pos.y + players[j].radius && lightballs[i].pos.y + lightballs[i].radius / 2 > players[j].pos.y - players[j].radius){
                 
-                
-                
-                // check if color is equal (YES?: +++; NO?: ---;)
-                if(players[j].player_nr == lightballs[i].colorIndex){
-                    
-                    // set lightman happy
-                    state_lightman = "happy";
-                    
-                    // give positive feedback to player
-                    players[j].color.set(0,255,0);
-                    
-                    //delete lightball
-                    lightballs.erase(lightballs.begin()+i);
-                    
-                    // add score
-                    score ++;
-                    catched_lightballs ++;
-                    
-                    // if still level 1, add lightball
-                    if(catched_lightballs <= 9){
-                        add_lightball();
-                    }
-                    //add light to ledstrip
-                }else {
-                    // set lightman sad
-                    state_lightman = "sad";
-                    
-                    // give negative feedback to player
-                    players[j].color.set(255,0,0);
-                    
-                    // delete lighboll
-                    lightballs.erase(lightballs.begin()+i);
-                    
-                    //update score
-                    catched_lightballs ++;
-                    
-                    if(catched_lightballs <= 9){
-                        add_lightball();
-                    }
-                    
-                    //add light to ledstrip
-                }
-                
+                update_score(j, i);
                 update_level();
                 
             }else{
                 players[j].color.set(colors[j][0],colors[j][1],colors[j][2]);
             }
         }
+    }
+}
+
+//--------------------------------------------------------------
+void ofApp::update_score(int indexPlayer, int indexLightball){
+    // check if color is equal (YES?: +++; NO?: ---;)
+    if(players[indexPlayer].player_nr == lightballs[indexLightball].colorIndex){
+        
+        // set lightman happy
+        state_lightman = "happy";
+        
+        // give positive feedback to player
+        players[indexPlayer].color.set(0,255,0);
+        
+        //delete lightball
+        lightballs.erase(lightballs.begin()+indexLightball);
+        
+        // add score
+        score ++;
+        catched_lightballs ++;
+        
+        //add light to ledstrip
+        serial.writeByte('d');
+        
+        // if still level 1, add lightball
+        if(catched_lightballs <= 9){
+            add_lightball();
+        }
+        
+        
+    }else {
+        // set lightman sad
+        state_lightman = "sad";
+        
+        // give negative feedback to player
+        players[indexPlayer].color.set(255,0,0);
+        
+        // delete lighboll
+        lightballs.erase(lightballs.begin()+indexLightball);
+        
+        //update score
+        catched_lightballs ++;
+        
+        //add light to ledstrip
+        serial.writeByte('e');
+        
+        
+        if(catched_lightballs <= 9){
+            add_lightball();
+        }
+        
+        
     }
 }
 
@@ -608,7 +658,7 @@ void ofApp::update_level(){
     }else if(catched_lightballs == 20){
         serial.writeByte('b');
         level = 3;
-        //game_state = "levelUp";
+        game_state = "levelUp";
         
     }else if(catched_lightballs == 30){
         game_state = "end";
@@ -698,5 +748,19 @@ void ofApp:: stop_lightmanMovies(){
     }else{
         neutralLightmanMovie.setPaused(true);
         neutralLightmanMovie.setPosition(0.01);
+    }
+}
+
+
+//--------------------------------------------------------------
+void ofApp:: update_opacity(){
+    if(increaseOpacity){
+        opacity += 1;
+    }else{
+        opacity -= 1;
+    }
+    
+    if(opacity == 255 || opacity == 0){
+        increaseOpacity = !increaseOpacity;
     }
 }

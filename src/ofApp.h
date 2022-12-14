@@ -34,7 +34,8 @@ public:
     void stop_lightmanMovies();
     void reset_game();
     void check_position_lightballs();
-
+    void update_score(int indexPlayer, int indexLightball);
+    void update_opacity();
     
     
     //technical setup
@@ -45,7 +46,7 @@ public:
     int width = 1920;
     int height = 1080;
     ofPoint nulPos;
-    string game_state; // start introVideo introGame countdown game levelUp end outro restart
+    string game_state; // start introVideo introGame countdown game levelUp end outro score
     
     int score = 0;
     int speed_nextLightball;
@@ -57,7 +58,8 @@ public:
     int game_mode; //easy medium hard
     string state_lightman = "neutral"; // neutral happy sad;
 
-    
+    int opacity = 255;
+    bool increaseOpacity = false;
     
     //media
     //video
@@ -81,8 +83,8 @@ public:
     // arduino
     ofSerial serial;
 
-    char  bytesRead[8];  // data from serial, we will be trying to read 8
-    char bytesReadString[9]; // a string needs a null terminator, so we need 8 + 1 bytes
+    char  bytesRead[6];  // data from serial, we will be trying to read 8
+    char bytesReadString[7]; // a string needs a null terminator, so we need 8 + 1 bytes
     std::string positions;
     std::string prev_positions;
     std::string firstCharacter;
