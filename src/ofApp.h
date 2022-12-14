@@ -36,6 +36,8 @@ public:
     void check_position_lightballs();
     void update_score(int indexPlayer, int indexLightball);
     void update_opacity();
+    void draw_feedbackMovies();
+    void update_feedbackMovies();
     
     
     //technical setup
@@ -61,6 +63,10 @@ public:
     int opacity = 255;
     bool increaseOpacity = false;
     
+    
+    int playerIndex; // index of player that scored/missed
+    ofPoint positionHit;
+    
     //media
     //video
     bool playVideo = false;
@@ -72,8 +78,8 @@ public:
     ofVideoPlayer sadLightmanMovie;
     ofVideoPlayer neutralLightmanMovie;
     ofVideoPlayer flicker1Movie;
+    ofVideoPlayer scoreMovie;
     //img
-    ofImage arrow;
     ofImage pickLevelImg;
     ofImage levelUpImg;
 
