@@ -39,6 +39,7 @@ public:
     void draw_feedbackMovies();
     void update_feedbackMovies();
     
+    int test = 0;
     
     //technical setup
     int heightTable = 38;
@@ -89,8 +90,8 @@ public:
     // arduino
     ofSerial serial;
 
-    char  bytesRead[6];  // data from serial, we will be trying to read 8
-    char bytesReadString[7]; // a string needs a null terminator, so we need 8 + 1 bytes
+    char  bytesRead[8];  // data from serial, we will be trying to read 8
+    char bytesReadString[9]; // a string needs a null terminator, so we need 8 + 1 bytes
     std::string positions;
     std::string prev_positions;
     std::string firstCharacter;

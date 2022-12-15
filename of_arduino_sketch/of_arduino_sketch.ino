@@ -1,115 +1,229 @@
-
-#define echoPin1 2 // attach pin D2 Arduino to pin Echo of HC-SR04
-#define trigPin1 3 //attach pin D3 Arduino to pin Trig of HC-SR04
-#define echoPin2 4
-#define trigPin2 5
-#define echoPin3 6
-#define trigPin3 7
-#define echoPin4 8
-#define trigPin4 9
-
-// defines variables
-long duration1; // variable for the duration of sound wave travel
-int distance1; // variable for the distance measurement
-long duration2;
-int distance2;
-long duration3;
-int distance3;
-long duration4;
-int distance4;
-
-int relay1 = 14;
-int relay2 = 15;
+#include "Keyboard.h"
+#include <FastLED.h>
 
 
+#define NUM_LEDS 30
+#define LED_PIN 10
+#define BRIGHTNESS  50
+#define LED_TYPE    WS2812B
+#define COLOR_ORDER GRB
+
+CRGB leds[NUM_LEDS];
+
+ //HCSR04 echo pins
+const int echoPin1 = 5;
+const int echoPin2 = 6;
+const int echoPin3 = 7;
+const int echoPin4 = 8;
+
+//Pin connected to ST_CP of 74HC595
+const int latchPin = 4;
+//Pin connected to DS of 74HC595
+const int dataPin = 2;
+//Pin connected to SH_CP of 74HC595
+const int clockPin = 3;
+
+
+
+const int relay1 = 14;
+const int relay2 = 15;
+const int relay3 = 16;
+
+byte ledsLevel = 0xe0 ;// 11100000;
+byte skip =  0x10 ;//00010000;
+
+byte triggerPin1;
+byte triggerPin2;
+byte triggerPin3;
+byte triggerPin4;
+byte zero;
+
+String game_state = ""; // start introVideo introGame countdown game levelUp end outro score
 String number = "";
 
 
-int level = 1;
+int level;
+int score;
+
 
 
 void setup() {
   Serial.begin (9600);
-  pinMode(trigPin1, OUTPUT);
+
   pinMode(echoPin1, INPUT);
-  pinMode(trigPin2, OUTPUT);
   pinMode(echoPin2, INPUT);
-  pinMode(trigPin3, OUTPUT);
-  pinMode(echoPin3, INPUT);
-  pinMode(trigPin4, OUTPUT);
+  pinMode(echoPin3, INPUT);  
   pinMode(echoPin4, INPUT);
+
+
   pinMode(relay1, OUTPUT);
   pinMode(relay2, OUTPUT);
+  pinMode(relay3, OUTPUT);
 
+  pinMode(latchPin, OUTPUT);
+  pinMode(dataPin, OUTPUT);
+  pinMode(clockPin, OUTPUT);
+
+  Keyboard.begin();
+
+  FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS);
+  FastLED.setBrightness(  BRIGHTNESS );
+  score = 0;
+  level = 0;
+
+  game_state = "start" ;  
   
 }
+
+
 void loop() {
-  long duration1, distance1;
 
   char inByte = 0;
+  int valueButton = analogRead(A0);
 
-  digitalWrite(relay1, HIGH);
-  digitalWrite(relay2, HIGH);
 
-    // get incoming byte:
-    inByte = Serial.read();
+  if(game_state == "start"){
+    //registerWrite(ledsLevel);
+    triggerPin1 = 0xe1;
+    triggerPin2 = 0xe2;
+    triggerPin3 = 0xe4;
+    triggerPin4 = 0xe8;
+    zero = 0xe0;
+
+    digitalWrite(relay1, LOW);
+    digitalWrite(relay2, LOW);
+    digitalWrite(relay3, LOW);
+    
+
+  }else if(game_state == "introVideo" || game_state == "introGame"){
+    //registerWrite(skip);
+    triggerPin1 = 0x11;
+    triggerPin2 = 0x12;
+    triggerPin3 = 0x14;
+    triggerPin4 = 0x18;
+    zero = 0x10;
+  
+  }else if(game_state == "countdown" || game_state == "game" || game_state == "levelUp" ){
+    triggerPin1 = 1; //00000001
+    triggerPin2 = 2; //00000010
+    triggerPin3 = 4; //00000100
+    triggerPin4 = 8; //00001000    
+    zero = 0;
+  }
+
+  if(game_state == "introGame"){
+    digitalWrite(relay1, HIGH);
+    digitalWrite(relay2, HIGH);
+    digitalWrite(relay3, HIGH);
+  }
+
+  // get incoming byte:
+  inByte = Serial.read();
 
     // light on => Level 2
-    if(inByte == 'a'){
-      level = 2;
-      //digitalWrite(relay1, LOW);
-    }
-
-    if(inByte == 'b') {
-      digitalWrite(relay2, LOW);
-    }
-
-    if(level == 2){
-      digitalWrite(relay1, LOW);
-    }
-
+  if(inByte == 'a'){
+    /*if(level < 3){
+      level ++;
+    }*/
     
-    digitalWrite(trigPin1, LOW);  // Added this line
-    delayMicroseconds(2); // Added this line
-    digitalWrite(trigPin1, HIGH);
-    delayMicroseconds(10); // Added this line
-    digitalWrite(trigPin1, LOW);
-    duration1 = pulseIn(echoPin1, HIGH);
-    distance1 = (duration1/2) / 29.1;
-    
-    
+  }
+  
+  if(inByte == 'b') {
+    //digitalWrite(relay2, LOW);
 
-    if (distance1 >= 500 || distance1 <= 0){
-      //Serial.print("99");
-      //Serial.print(",");
-      number += "00";
-      
+    game_state = "introVideo";
+  }
+
+  if(inByte == 'c'){
+    game_state = "introGame";
+  }
+
+  if(inByte == 'd'){
+    game_state = "game";
+  }
+
+  // score
+  if(inByte == 'e'){
+    leds[score] = CRGB::Green;
+    score ++;
+    FastLED.show();
+  }
+
+  // miss
+  if(inByte == 'f'){
+    leds[score] = CRGB::Red;   
+    score ++; 
+    FastLED.show();
+  }
+
+
+  //reset
+  if(inByte == 'r'){
+    level = 0;
+    score = 0;
+
+    for(int i=0; i< 30; i++){
+      leds[i] = CRGB::Black;
     }
-    else {
-      //Serial.print(distance1); 
-      //Serial.print(",");  
+    FastLED.show();
+
+    game_state = "start" ; 
+  }
+
+  if(score >= 10){
+    digitalWrite(relay1, LOW);
+  }
+
+  if(score >= 20){
+    digitalWrite(relay2, LOW);
+  }
+
+  if(score == 30){
+    digitalWrite(relay3, LOW);
+  }
+
+
+  
+
+  if (valueButton >= 700 && valueButton < 800) {
+    //button 1: easy
+    Keyboard.write('e');
+  } else if (valueButton >= 600 && valueButton < 700) {
+    //button 2: medium
+    Keyboard.write('i');
+  } else if (valueButton > 480 && valueButton < 600) {
+    //button 3: hard
+    Keyboard.write('h');
+  } else if (valueButton < 480) {
+    //button 4: skip
+    Keyboard.write('s');
+
+  }
+
+
+
+  if(level == 2){
+    digitalWrite(relay1, LOW);
+  }
+
+  
+  long  distance1;
+  distance1 = get74HC595DistanceHCSSR04(triggerPin1,echoPin1, zero);
+  if (distance1 >= 500 || distance1 <= 0){
+      number += "00";     
+    } else { 
       if(distance1 < 10) {
         number += "0";
         number += String(distance1);
       }else {
         number += String(distance1);
       }
-      
-      
     }
 
-    
-    long duration2, distance2;
-    
-    digitalWrite(trigPin2, LOW);  // Added this line
-    delayMicroseconds(2); // Added this line
-    digitalWrite(trigPin2, HIGH);
-    delayMicroseconds(10); // Added this line
-    digitalWrite(trigPin2, LOW);
-    duration2 = pulseIn(echoPin2, HIGH);
-    distance2= (duration2/2) / 29.1;
 
-    if (distance2 >= 500 || distance2 <= 0){
+  long  distance2;
+  distance2 = get74HC595DistanceHCSSR04(triggerPin2,echoPin2, zero);
+  if (distance2 >= 500 || distance2 <= 0){
       //Serial.println("99");
       distance2 = 0;
     }
@@ -123,17 +237,10 @@ void loop() {
       }
     }
 
-    long duration3, distance3;
-    
-    digitalWrite(trigPin3, LOW);  // Added this line
-    delayMicroseconds(2); // Added this line
-    digitalWrite(trigPin3, HIGH);
-    delayMicroseconds(10); // Added this line
-    digitalWrite(trigPin3, LOW);
-    duration3 = pulseIn(echoPin3, HIGH);
-    distance3 = (duration3/2) / 29.1;
 
-    if (distance3 >= 500 || distance3 <= 0){
+  long distance3;
+  distance3 = get74HC595DistanceHCSSR04(triggerPin3,echoPin3, zero);
+  if (distance3 >= 500 || distance3 <= 0){
       //Serial.println("99");
       distance3 = 0;
     }
@@ -143,20 +250,13 @@ void loop() {
         number += String(distance3);
       }else {
         number += String(distance3);
+
       }
     }
 
-    long duration4, distance4;
-    
-    digitalWrite(trigPin4, LOW);  // Added this line
-    delayMicroseconds(2); // Added this line
-    digitalWrite(trigPin4, HIGH);
-    delayMicroseconds(10); // Added this line
-    digitalWrite(trigPin4, LOW);
-    duration4 = pulseIn(echoPin4, HIGH);
-    distance4 = (duration4/2) / 29.1;
-
-    if (distance4 >= 500 || distance4 <= 0){
+  long distance4;
+  distance4 = get74HC595DistanceHCSSR04(triggerPin4,echoPin4, zero);
+  if (distance4 >= 500 || distance4 <= 0){
       //Serial.println("99");
       distance4 = 0;
     }
@@ -168,13 +268,53 @@ void loop() {
         number += String(distance4);
       }
     }
-      
-    Serial.println(number);
-    number = "";
-    //Serial.println(String("43452"));
-    Serial.flush(); 
 
 
+  Serial.println(number);
+  number = "";
+  //Serial.println(String("43452"));
+  Serial.flush(); 
+}
+
+void registerWrite(int funcLeds) {
+  digitalWrite(latchPin, LOW);//stop anything changine while writing
+  shiftOut(dataPin, clockPin, MSBFIRST, funcLeds);
+  digitalWrite(latchPin, HIGH);//allow pins to change
+}
+
+int get74HC595DistanceHCSSR04(int funcTriggerPin, int funcEchoPin, int zero){
+
+  unsigned long duration;  //time taken for echo
+  int myDistance;
+
+  digitalWrite(latchPin, LOW);//stop anything changine while writing
+  shiftOut(dataPin, clockPin, MSBFIRST, zero);//send all zeros
+  digitalWrite(latchPin, HIGH);//allow pins to change
+  
+  //A tiny delay 2 millionths of a second
+  delayMicroseconds(2);
+  
+  // Sets the trigPin HIGH (ACTIVE) for 10 microseconds
+  //same as turing the LED on in the blink sketch
+  //digitalWrite(funcTriggerPin, HIGH);
+  digitalWrite(latchPin, LOW);//stop anything changine while writing
+  shiftOut(dataPin, clockPin, MSBFIRST, funcTriggerPin);//pin to go HIGH
+  digitalWrite(latchPin, HIGH);//allow pins to change
+  
+  
+  //pin stays HIGH (5v) for 10 microseconds to trigger a pulse
+  delayMicroseconds(10);
+  
+  //Pin taken LOW (0v) after pulse triggered ready for next pulse
+  //digitalWrite(funcTriggerPin, LOW);
+  digitalWrite(latchPin, LOW);//stop anything changine while writing
+  shiftOut(dataPin, clockPin, MSBFIRST, zero);//send all zeros
+  digitalWrite(latchPin, HIGH);//allow pins to change
+
+  duration = pulseIn(funcEchoPin, HIGH);
+
+   myDistance = (duration/2) / 29.1;
+   return myDistance;
 }
 
   

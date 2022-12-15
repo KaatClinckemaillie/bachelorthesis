@@ -25,6 +25,7 @@ void ofApp::updateVideo(ofEventArgs & args){
             introMovie.stop();
             introMovie.close();
             game_state = "introGame";
+            serial.writeByte('c');
             
             
         }
@@ -42,6 +43,7 @@ void ofApp::updateVideo(ofEventArgs & args){
         if(level == 3){
             flicker1Movie.close();
             game_state = "game";
+            
         }
      }else if(game_state == "outro"){
          // video outro
@@ -119,7 +121,7 @@ void ofApp::setup(){
         players.push_back(p);
     }
     
-    memset(bytesReadString, 0, 7);
+    memset(bytesReadString, 0, 9);
     
 }
 
@@ -134,23 +136,28 @@ void ofApp::update(){
     
     
 
-    if(serial.available()){
-        unsigned char bytesReturned[6];
+    if(serial.available() < 0){
         
-        memset(bytesReadString, 0, 7);
-        memset(bytesReturned, 0, 6);
+    }else {
         
-        memcpy(bytesReadString, bytesReturned, 6);
-        serial.readBytes(bytesReturned, 6);
-        string serialData = (char*) bytesReturned;
-        positions = serialData;
-
-
-        //update_players();
-        
-        //firstCharacter= positions.substr(0, 2);
-        //secondCharacter = positions.substr(2,2);
-        serial.flush();
+        while(serial.available() > 0){
+            unsigned char bytesReturned[8];
+            
+            memset(bytesReadString, 0, 9);
+            memset(bytesReturned, 0, 8);
+            
+            memcpy(bytesReadString, bytesReturned, 8);
+            serial.readBytes(bytesReturned, 8);
+            string serialData = (char*) bytesReturned;
+            positions = serialData;
+            
+            test ++;
+            update_players();
+            
+            firstCharacter= positions.substr(0, 2);
+            secondCharacter = positions.substr(2,2);
+            serial.flush();
+        }
     }
    
 
@@ -184,6 +191,7 @@ void ofApp::update(){
             neutralLightmanMovie.play();
             
             game_state = "game";
+            serial.writeByte('d');
             
             
             // eerste lichtbol heel traag en animatie bij de bal
@@ -269,10 +277,11 @@ void ofApp::draw(){
     ofSetColor(0);
     ofDrawRectangle(nulPos.x, nulPos.y, width, height);
     
-    
+    ofSetColor(255);
     ofDrawBitmapString(positions, 50, 100);
-    //ofDrawBitmapString(firstCharacter, 50, 120);
-    //ofDrawBitmapString(secondCharacter, 50, 130);
+    ofDrawBitmapString(firstCharacter, 1000, 520);
+    ofDrawBitmapString(secondCharacter, 50, 130);
+    ofDrawBitmapString(ofToString(test), 50, 150);
     //ofDrawBitmapString(players[0].pos.y, 50, 200);
     //ofDrawBitmapString(players[1].pos.y, 50, 210);
     
@@ -343,37 +352,7 @@ void ofApp::draw(){
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
-    if(game_state == "start"){
-        if(key == 'e'){
-            game_mode = 1; //easy
-            setup_game();
-            game_state = "introVideo";
-            playVideo = true;
-            
-        }
-        if(key == 'm'){
-            game_mode = 2; //medium
-            setup_game();
-            game_state = "introVideo";
-        }
-        if(key == 'h'){
-            game_mode = 3; // hard
-            setup_game();
-            game_state = "introVideo";
-        }
-        
-    }else if(game_state == "introVideo"){
-        if(key == 's'){
-            introMovie.close();
-            game_state = "introGame";
-        }
-    }else if(game_state == "introGame"){
-        if(key == 's'){
-            introLightmanMovie.close();
-            game_state = "countdown";
-        }
-        
-    }
+    
 }
 
 //--------------------------------------------------------------
@@ -383,6 +362,44 @@ void ofApp::mousePressed(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
+    
+    if(game_state == "start"){
+        if(key == 'e'){
+            game_mode = 1; //easy
+            setup_game();
+            game_state = "introVideo";
+            serial.writeByte('b');
+            playVideo = true;
+            
+        }
+        if(key == 'i'){
+            game_mode = 2; //medium
+            setup_game();
+            game_state = "introVideo";
+            serial.writeByte('b');
+            playVideo = true;
+        }
+        if(key == 'h'){
+            game_mode = 3; // hard
+            setup_game();
+            game_state = "introVideo";
+            serial.writeByte('b');
+            playVideo = true;
+        }
+        
+    }else if(game_state == "introVideo"){
+        if(key == 's'){
+            introMovie.close();
+            game_state = "introGame";
+            serial.writeByte('c');
+        }
+    }else if(game_state == "introGame"){
+        if(key == 's'){
+            introLightmanMovie.close();
+            game_state = "countdown";
+        }
+        
+    }
     
 
     if(game_state == "game"){
@@ -441,7 +458,7 @@ void ofApp::windowResized(int w, int h){
 
 //--------------------------------------------------------------
 void ofApp::reset_game(){
-    serial.writeByte('c');
+    serial.writeByte('r');
     score = 0;
     catched_lightballs = 0;
     throwed_lightballs = 0;
