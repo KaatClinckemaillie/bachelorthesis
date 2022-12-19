@@ -8,6 +8,7 @@ void ofApp::setupVideo(){
     //load media
     introMovie.load("movies/intro.mp4");
     flicker1Movie.load("movies/flicker1.mp4");
+    endscoreMovie.load("movies/endscoreScreen.mp4");
     
 }
 
@@ -49,6 +50,16 @@ void ofApp::updateVideo(ofEventArgs & args){
          // video outro
          
          // if done? show score
+     }else if(game_state == "score"){
+         endscoreMovie.play();
+         endscoreMovie.update();
+         
+         if(endscoreMovie.getPosition() >= 0.95){
+             endscoreMovie.stop();
+             endscoreMovie.close();
+             
+             reset_game();
+         }
      }
         
         if(level == 3){
@@ -72,8 +83,9 @@ void ofApp::drawVideo(ofEventArgs & args){
         flicker1Movie.draw(0, 0, ofGetWidth(), ofGetWidth() * 9 / 16);
         
     
-    } else if (game_state == "end") {
-
+    } else if (game_state == "score") {
+        ofSetColor(255);
+        endscoreMovie.draw(0, 0, ofGetWidth(), ofGetWidth() * 9 / 16);
     }
 }
 
@@ -92,10 +104,14 @@ void ofApp::setup(){
     happyLightmanMovie.load("movies/happyLightman.mp4");
     
     scoreMovie.load("movies/score.mp4");
+    loseMovie.load("movies/lose.mp4");
     
     
-    pickLevelImg.load("images/pickLevel.png");
+    pickLevelMovie.load("movies/pickLevel.mp4");
     levelUpImg.load("images/levelUp.png");
+    
+    //endscoreProjectionMovie.load("movies/endscoreProjection.mp4");
+    
 
     
 
@@ -165,7 +181,12 @@ void ofApp::update(){
 
     
     if(game_state == "start"){
+        pickLevelMovie.play();
+        pickLevelMovie.update();
         
+    }else if(game_state =="introVideo"){
+        pickLevelMovie.stop();
+        pickLevelMovie.close();
         
     }else if(game_state=="introGame"){
         introLightmanMovie.play();
@@ -243,8 +264,7 @@ void ofApp::update(){
             }else if(score >= 30){
                 opacity = 0;
                 // stop all the lightman video's
-                
-                game_state == "end";
+            
             }
             
             
@@ -291,9 +311,9 @@ void ofApp::draw(){
     if(game_state=="start"){
         //ofDrawBitmapString("Pick your level", 1000, 500);
         ofSetColor(255);
-        int size_x = 124;
-        int size_y = 534;
-        pickLevelImg.draw(width + nulPos.x - 400 , nulPos.y + height/2 - size_y/2, size_x, size_y);
+        int size_x = 782;
+        int size_y = 1080;
+        pickLevelMovie.draw(width + nulPos.x - 400 , nulPos.y + height/2 - size_y/2, size_x, size_y);
         
     }else if (game_state == "introGame") {
         ofSetColor(255);
@@ -301,7 +321,7 @@ void ofApp::draw(){
     }else if (game_state == "countdown") {
         ofSetColor(255);
         
-        countdownMovie.draw(width/2 + nulPos.x, nulPos.y, 800, 800);
+        countdownMovie.draw(width/2 + nulPos.x, nulPos.y, 782, 1080);
         
     }else if (game_state == "game") {
         //draw score
@@ -471,6 +491,7 @@ void ofApp::reset_game(){
     //load media
     introMovie.load("movies/intro.mp4");
     flicker1Movie.load("movies/flicker1.mp4");
+    endscoreMovie.load("movies/endscoreScreen.mp4");
     
     introLightmanMovie.load("movies/introLightman.mp4");
     countdownMovie.load("movies/countdown.mp4");
@@ -479,6 +500,8 @@ void ofApp::reset_game(){
     neutralLightmanMovie.load("movies/neutralLightman.mp4");
     sadLightmanMovie.load("movies/sadLightman.mp4");
     happyLightmanMovie.load("movies/happyLightman.mp4");
+    
+    pickLevelMovie.load("movies/pickLevel.mp4");
     
     
     
@@ -521,16 +544,6 @@ void ofApp::add_lightball(){
         lightballs.push_back(l);
     }
 }
-
-/*
-//--------------------------------------------------------------
-void ofApp::check_position_lightballs(){
-    for(int i = 0; i < lightballs.size(); i++){
-        if(lightballs[i].pos.x == 900 + nulPos.x){
-            add_lightball();
-        }
-    }
-}*/
 
 //--------------------------------------------------------------
 void ofApp::update_players(){
@@ -604,7 +617,6 @@ void ofApp::update_score(int indexPlayer, int indexLightball){
         state_lightman = "happy";
         
         // give positive feedback to player
-        players[indexPlayer].color.set(0,255,0);
         positionHit.x = players[indexPlayer].pos.x;
         positionHit.y = players[indexPlayer].pos.y;
         scoreMovie.play();
@@ -630,7 +642,9 @@ void ofApp::update_score(int indexPlayer, int indexLightball){
         state_lightman = "sad";
         
         // give negative feedback to player
-        players[indexPlayer].color.set(255,0,0);
+        positionHit.x = players[indexPlayer].pos.x;
+        positionHit.y = players[indexPlayer].pos.y;
+        loseMovie.play();
         
         // delete lighboll
         lightballs.erase(lightballs.begin()+indexLightball);
@@ -678,15 +692,38 @@ void ofApp::update_level(){
         serial.writeByte('a');
         level = 2;
         game_state = "levelUp";
+        //stop animations
+        if(scoreMovie.isPlaying()){
+            scoreMovie.stop();
+            scoreMovie.setPosition(0.01);
+        }
         
+        if(loseMovie.isPlaying()){
+            loseMovie.stop();
+            loseMovie.setPosition(0.01);
+        }
         
     }else if(catched_lightballs == 20){
         serial.writeByte('b');
         level = 3;
         game_state = "levelUp";
         
+        if(scoreMovie.isPlaying()){
+            scoreMovie.stop();
+            scoreMovie.setPosition(0.01);
+        }
+        
+        if(loseMovie.isPlaying()){
+            loseMovie.stop();
+            loseMovie.setPosition(0.01);
+        }
+        
     }else if(catched_lightballs == 30){
-        game_state = "end";
+        game_state = "score";
+        
+        scoreMovie.close();
+        loseMovie.close();
+        
     }
 }
 
@@ -800,16 +837,33 @@ void ofApp:: draw_feedbackMovies(){
         ofSetColor(255);
         scoreMovie.draw(positionHit.x - sizeVideo/2, positionHit.y-sizeVideo/2, sizeVideo, sizeVideo);
     }
+    
+    if(loseMovie.isPlaying()){
+        ofSetColor(255);
+        loseMovie.draw(positionHit.x - sizeVideo/2, positionHit.y-sizeVideo/2, sizeVideo, sizeVideo);
+    }
 }
 
 //--------------------------------------------------------------
 void ofApp:: update_feedbackMovies(){
-    if(scoreMovie.isPlaying()){
-        scoreMovie.update();
-        
-        if(scoreMovie.getPosition() >= 0.8){
-            scoreMovie.stop();
-            scoreMovie.setPosition(0.01);
+    
+
+        if(scoreMovie.isPlaying()){
+            scoreMovie.update();
+            
+            if(scoreMovie.getPosition() >= 0.8){
+                scoreMovie.stop();
+                scoreMovie.setPosition(0.01);
+            }
         }
-    }
+        
+        if(loseMovie.isPlaying()){
+            loseMovie.update();
+            
+            if(loseMovie.getPosition() >= 0.8){
+                loseMovie.stop();
+                loseMovie.setPosition(0.01);
+            }
+        }
+    
 }

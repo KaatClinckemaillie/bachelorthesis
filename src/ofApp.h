@@ -80,6 +80,10 @@ public:
     ofVideoPlayer neutralLightmanMovie;
     ofVideoPlayer flicker1Movie;
     ofVideoPlayer scoreMovie;
+    ofVideoPlayer loseMovie;
+    ofVideoPlayer pickLevelMovie;
+    ofVideoPlayer endscoreProjectionMovie;
+    ofVideoPlayer endscoreMovie;
     //img
     ofImage pickLevelImg;
     ofImage levelUpImg;

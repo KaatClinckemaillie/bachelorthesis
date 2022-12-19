@@ -23,7 +23,18 @@ const int dataPin = 2;
 //Pin connected to SH_CP of 74HC595
 const int clockPin = 3;
 
+byte triggerPin1On = B00000001;
+byte triggerPin2On = B00000010;
+byte triggerPin3On = B00000100;
+byte triggerPin4On = B00001000;
 
+byte ledPin1On = B00010000;
+byte ledPin2On = B00100000;
+byte ledPin3On = B01000000;
+byte ledPin4On = B10000000;
+
+// example: set triggerPin1 to on qnd ledPin1 to on
+// byte result = 0 | triggerPin1On | ledPin1On;
 
 const int relay1 = 14;
 const int relay2 = 15;
@@ -97,7 +108,7 @@ void loop() {
 
   }else if(game_state == "introVideo" || game_state == "introGame"){
     //registerWrite(skip);
-    triggerPin1 = 0x11;
+    triggerPin1 = 0x11; 
     triggerPin2 = 0x12;
     triggerPin3 = 0x14;
     triggerPin4 = 0x18;
