@@ -95,11 +95,11 @@ void loop() {
 
   if(game_state == "start"){
     //registerWrite(ledsLevel);
-    triggerPin1 = 0xe1;
-    triggerPin2 = 0xe2;
-    triggerPin3 = 0xe4;
-    triggerPin4 = 0xe8;
-    zero = 0xe0;
+    triggerPin1 = 0 | triggerPin1On | ledPin1On | ledPin2On | ledPin3On;
+    triggerPin2 = 0 | triggerPin2On | ledPin1On | ledPin2On | ledPin3On;
+    triggerPin3 = 0 | triggerPin3On | ledPin1On | ledPin2On | ledPin3On;
+    triggerPin4 = 0 | triggerPin4On | ledPin1On | ledPin2On | ledPin3On;
+    zero = 0 | ledPin1On | ledPin2On | ledPin3On;
 
     digitalWrite(relay1, LOW);
     digitalWrite(relay2, LOW);
@@ -108,17 +108,31 @@ void loop() {
 
   }else if(game_state == "introVideo" || game_state == "introGame"){
     //registerWrite(skip);
-    triggerPin1 = 0x11; 
+   /* triggerPin1 = 0x11; 
     triggerPin2 = 0x12;
     triggerPin3 = 0x14;
     triggerPin4 = 0x18;
-    zero = 0x10;
+    zero = 0x10;*/
+
+    triggerPin1 = 0 | triggerPin1On | ledPin4On;
+    triggerPin2 = 0 | triggerPin2On | ledPin4On;
+    triggerPin3 = 0 | triggerPin3On | ledPin4On;
+    triggerPin4 = 0 | triggerPin4On | ledPin4On;
+    zero = 0 | ledPin4On;
+
   
   }else if(game_state == "countdown" || game_state == "game" || game_state == "levelUp" ){
-    triggerPin1 = 1; //00000001
+   /* triggerPin1 = 1; //00000001
     triggerPin2 = 2; //00000010
     triggerPin3 = 4; //00000100
     triggerPin4 = 8; //00001000    
+    zero = 0; */
+
+
+    triggerPin1 = triggerPin1On;
+    triggerPin2 = triggerPin2On;
+    triggerPin3 = triggerPin3On;
+    triggerPin4 = triggerPin4On;
     zero = 0;
   }
 
