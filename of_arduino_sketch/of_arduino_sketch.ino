@@ -106,7 +106,7 @@ void loop() {
     digitalWrite(relay3, LOW);
     
 
-  }else if(game_state == "introVideo" || game_state == "introGame"){
+  }else if(game_state == "introVideo" || game_state == "introGame" || game_state == "score"){
     //registerWrite(skip);
    /* triggerPin1 = 0x11; 
     triggerPin2 = 0x12;
@@ -179,6 +179,10 @@ void loop() {
     leds[score] = CRGB::Red;   
     score ++; 
     FastLED.show();
+  }
+
+  if(inByte == 'g'){
+    game_state = "score";
   }
 
 

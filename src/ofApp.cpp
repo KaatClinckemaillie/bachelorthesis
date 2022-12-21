@@ -9,14 +9,18 @@ void ofApp::setupVideo(){
     introMovie.load("movies/intro.mp4");
     flicker1Movie.load("movies/flicker1.mp4");
     flicker2Movie.load("movies/flicker2.mp4");
-    endscoreMovie.load("movies/endscoreScreen.mp4");
     outroMovie.load("movies/outro.mp4");
+    
+    font.load("BebasNeue-Regular.ttf", 180);
     
 }
 
 
 //--------------------------------------------------------------
 void ofApp::updateVideo(ofEventArgs & args){
+    
+    
+    
     
     if(game_state == "introVideo"){
         introMovie.play();
@@ -54,17 +58,20 @@ void ofApp::updateVideo(ofEventArgs & args){
                 game_state = "game";
             }
         }
-     }else if(game_state == "outro"){
+     }else if(game_state == "outro" || game_state == "score"){
+         
          // video outro
+         outroMovie.play();
+         outroMovie.update();
          
-         // if done? show score
-     }else if(game_state == "score"){
-         endscoreMovie.play();
-         endscoreMovie.update();
+         if(outroMovie.getPosition() >= 0.51){
+             game_state = "score";
+             endScore = ofToString(score) + "/30";
+         }
          
-         if(endscoreMovie.getPosition() >= 0.95){
-             endscoreMovie.stop();
-             endscoreMovie.close();
+         if(outroMovie.getPosition() >= 0.95){
+             outroMovie.stop();
+             outroMovie.close();
              
              reset_game();
          }
@@ -75,7 +82,6 @@ void ofApp::updateVideo(ofEventArgs & args){
 
 //--------------------------------------------------------------
 void ofApp::drawVideo(ofEventArgs & args){
-    ofSetColor(255);
     
     if (game_state == "start") {
         ofDrawBitmapString("screen for video", 100, 50);
@@ -94,9 +100,14 @@ void ofApp::drawVideo(ofEventArgs & args){
             flicker2Movie.draw(0, 0, ofGetWidth(), ofGetWidth() * 9 / 16);
         }
     
-    } else if (game_state == "score") {
+    } else if (game_state == "outro" || game_state == "score") {
         ofSetColor(255);
-        endscoreMovie.draw(0, 0, ofGetWidth(), ofGetWidth() * 9 / 16);
+        outroMovie.draw(0, 0, ofGetWidth(), ofGetWidth() * 9 / 16);
+    }
+    
+    if(game_state == "score"){
+        ofSetColor(255);
+        font.drawString(endScore, ofGetWidth()/2 - font.stringWidth(endScore)/2, ofGetHeight()/2 + font.stringHeight(endScore)/2);
     }
 }
 
@@ -257,7 +268,7 @@ void ofApp::update(){
             
             
         }else if(level == 3) {
-            if(score < 30){
+            if(catched_lightballs < 30){
                 float now = ofGetElapsedTimef();
                 if(now > nextLightballSeconds) {
                     add_lightball();
@@ -266,7 +277,7 @@ void ofApp::update(){
                 update_opacity();
             
             
-            }else if(score >= 30){
+            }else if(catched_lightballs >= 30){
                 opacity = 0;
                 // stop all the lightman video's
             
@@ -433,6 +444,10 @@ void ofApp::keyPressed(int key){
             game_state = "countdown";
         }
         
+    }else if(game_state == "score"){
+        outroMovie.stop();
+        outroMovie.close();
+        reset_game();
     }
     
 

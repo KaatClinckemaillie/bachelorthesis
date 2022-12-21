@@ -66,6 +66,7 @@ public:
     int level;
     int game_mode; //easy medium hard
     string state_lightman = "neutral"; // neutral happy sad;
+    string endScore;
 
     int opacity = 255;
     bool increaseOpacity = false;
@@ -93,6 +94,8 @@ public:
     ofVideoPlayer endscoreMovie;
     ofVideoPlayer levelUpMovie;
     ofVideoPlayer outroMovie;
+    
+    ofTrueTypeFont font;
     
     
     //img
