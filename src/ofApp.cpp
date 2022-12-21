@@ -20,10 +20,6 @@ void ofApp::setupVideo(){
 
 //--------------------------------------------------------------
 void ofApp::updateVideo(ofEventArgs & args){
-    
-    
-    
-    
     if(game_state == "introVideo"){
         introMovie.play();
         introMovie.update();
@@ -68,6 +64,7 @@ void ofApp::updateVideo(ofEventArgs & args){
          
          if(outroMovie.getPosition() >= 0.51){
              game_state = "score";
+             serial.writeByte('g');
              endScore = ofToString(score) + "/30";
          }
          
@@ -86,7 +83,7 @@ void ofApp::updateVideo(ofEventArgs & args){
 void ofApp::drawVideo(ofEventArgs & args){
     
     if (game_state == "start") {
-        ofDrawBitmapString("screen for video", 100, 50);
+       /* ofDrawBitmapString(ofToString(test.length()), 100, 50);*/
         
     }else if (game_state == "introVideo") {
         ofSetColor(255);
@@ -145,7 +142,7 @@ void ofApp::setup(){
     serial.listDevices();
     vector <ofSerialDeviceInfo> deviceList = serial.getDeviceList();
     int baud = 9600;
-    serial.setup(0, baud); //open the first device
+    serial.setup("/dev/tty.usbmodemHIDPC1", baud); //open the first device
     //serial.setup("/dev/tty.usbserial-A4001JEC", baud); // mac osx example
 
     //setup game
@@ -192,11 +189,12 @@ void ofApp::update(){
             string serialData = (char*) bytesReturned;
             positions = serialData;
             
-            test ++;
-            update_players();
             
-            firstCharacter= positions.substr(0, 2);
-            secondCharacter = positions.substr(2,2);
+            
+            if(positions.length() >= 8){
+                update_players();
+            }
+            
             serial.flush();
         }
     }
@@ -322,9 +320,9 @@ void ofApp::draw(){
     ofDrawRectangle(nulPos.x, nulPos.y, width, height);
     
     ofSetColor(255);
-    ofDrawBitmapString(loseMovie.getPosition(), 50, 100);
-    ofDrawBitmapString(backgroundGameSound.getPosition(), 50, 150);
-    ofDrawBitmapString(game_state, 50, 200);
+    //ofDrawBitmapString(positions, 50, 100);
+   // ofDrawBitmapString(backgroundGameSound.getPosition(), 50, 150);
+    //ofDrawBitmapString(game_state, 50, 200);
     //ofDrawBitmapString(secondCharacter, 50, 130);
     //ofDrawBitmapString(ofToString(test), 50, 150);
     //ofDrawBitmapString(players[0].pos.y, 50, 200);
@@ -498,6 +496,7 @@ void ofApp::reset_game(){
     lightballs.clear();
     
     
+    
     //load media
     introMovie.load("movies/intro.mp4");
     flicker1Movie.load("movies/flicker1.mp4");
@@ -560,7 +559,8 @@ void ofApp::add_lightball(){
 
 //--------------------------------------------------------------
 void ofApp::update_players(){
-    int marge = 50;
+    int marge = 60;
+    
     
     for (int i = 0; i < players.size(); i++) {
         
@@ -571,19 +571,18 @@ void ofApp::update_players(){
         int num = floor((getPosition * height)/ float(maxPosSensor));
         
         
-        if(num < minPosSensor){
+        /*if(num < minPosSensor){
             num = minPosSensor + players[i].radius;
         }else if(num > maxPosSensor){
             num = maxPosSensor - players[i].radius;
-        }
+        }*/
         
         
         
         
         // check if big difference, yes: change position, no: stay the same
         // to avoid 'flickering'
-        if(num > players[i].pos.y + marge || num < players[i].pos.y - marge) {
-            
+        if(num > players[i].pos.y + players[i].radius + marge || num < players[i].pos.y - marge - players[i].radius) {
             
             int newPosition = num + nulPos.y;
             
@@ -810,7 +809,7 @@ void ofApp::update_lightman(){
 //--------------------------------------------------------------
 
 void ofApp::draw_lightman(){
-    int sizeVideo = 200;
+    int sizeVideo = 300;
     
     if(neutralLightmanMovie.isPlaying()){
         ofSetColor(255);

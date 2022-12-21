@@ -28,10 +28,10 @@ byte triggerPin2On = B00000010;
 byte triggerPin3On = B00000100;
 byte triggerPin4On = B00001000;
 
-byte ledPin1On = B00010000;
-byte ledPin2On = B00100000;
-byte ledPin3On = B01000000;
-byte ledPin4On = B10000000;
+byte ledPin1On = B10000000;
+byte ledPin2On = B01000000;
+byte ledPin3On = B00100000;
+byte ledPin4On = B00010000;
 
 // example: set triggerPin1 to on qnd ledPin1 to on
 // byte result = 0 | triggerPin1On | ledPin1On;
@@ -82,6 +82,11 @@ void setup() {
   score = 0;
   level = 0;
 
+  for(int i=0; i< 30; i++){
+      leds[i] = CRGB::Black;
+  }
+
+
   game_state = "start" ;  
   
 }
@@ -122,11 +127,7 @@ void loop() {
 
   
   }else if(game_state == "countdown" || game_state == "game" || game_state == "levelUp" ){
-   /* triggerPin1 = 1; //00000001
-    triggerPin2 = 2; //00000010
-    triggerPin3 = 4; //00000100
-    triggerPin4 = 8; //00001000    
-    zero = 0; */
+
 
 
     triggerPin1 = triggerPin1On;
@@ -215,14 +216,14 @@ void loop() {
   
 
   if (valueButton >= 700 && valueButton < 800) {
-    //button 1: easy
-    Keyboard.write('e');
+    //button 1: hard
+    Keyboard.write('h');
   } else if (valueButton >= 600 && valueButton < 700) {
     //button 2: medium
     Keyboard.write('i');
   } else if (valueButton > 480 && valueButton < 600) {
-    //button 3: hard
-    Keyboard.write('h');
+    //button 3: easy
+    Keyboard.write('e');
   } else if (valueButton < 480) {
     //button 4: skip
     Keyboard.write('s');

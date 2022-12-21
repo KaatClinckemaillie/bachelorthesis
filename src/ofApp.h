@@ -41,7 +41,7 @@ public:
 
     
     
-    int test = 0;
+    string test = "test";
     
     //technical setup
     int maxPosSensor = 47;
