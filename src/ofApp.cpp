@@ -6,11 +6,13 @@ void ofApp::setupVideo(){
     ofSetVerticalSync(true);
     
     //load media
+    ofSetDataPathRoot("../Resources/data/");
     introMovie.load("movies/intro.mp4");
     flicker1Movie.load("movies/flicker1.mp4");
     flicker2Movie.load("movies/flicker2.mp4");
     outroMovie.load("movies/outro.mp4");
     
+    // size depends on screen size!
     font.load("BebasNeue-Regular.ttf", 180);
     
 }
@@ -115,7 +117,7 @@ void ofApp::drawVideo(ofEventArgs & args){
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-
+    ofSetDataPathRoot("../Resources/data/");
     //load media
     introLightmanMovie.load("movies/introLightman.mp4");
     countdownMovie.load("movies/countdown.mp4");
@@ -134,10 +136,9 @@ void ofApp::setup(){
     
     endMovie.load("movies/end.mp4");
     
+    backgroundGameSound.load("music/backgroundGame.mp3");
     
-    //endscoreProjectionMovie.load("movies/endscoreProjection.mp4");
     
-
     
 
     // connect with arduino
@@ -163,14 +164,13 @@ void ofApp::setup(){
     }
     
     memset(bytesReadString, 0, 9);
-    
+    backgroundGameSound.play();
 }
 
 
 
 //--------------------------------------------------------------
 void ofApp::update(){
-
     
     nulPos.x = (ofGetWidth() - width)/2;
     nulPos.y = (ofGetHeight() -height)/2;
@@ -212,6 +212,7 @@ void ofApp::update(){
     }else if(game_state =="introVideo"){
         pickLevelMovie.stop();
         pickLevelMovie.close();
+        backgroundGameSound.setVolume(0.0);
         
     }else if(game_state=="introGame"){
         introLightmanMovie.play();
@@ -248,6 +249,9 @@ void ofApp::update(){
 
 
     }else if(game_state == "game") {
+        
+        backgroundGameSound.setVolume(0.5);
+       //
         
         update_feedbackMovies();
         update_lightman();
@@ -289,7 +293,7 @@ void ofApp::update(){
         
 
     }else if(game_state == "levelUp"){
-        
+        backgroundGameSound.setVolume(0.1);
         levelUpMovie.update();
         
         if(levelUpMovie.getPosition() >= 0.95){
@@ -298,7 +302,7 @@ void ofApp::update(){
         }
         
     }else if(game_state == "end") {
-        
+        backgroundGameSound.setVolume(0.0);
         endMovie.play();
         endMovie.update();
         
@@ -306,18 +310,7 @@ void ofApp::update(){
             endMovie.setPaused(true);
             game_state = "outro";
         }
-        
-        
-    }else if(game_state == "score"){
-        // display score for 10 sec
-        
-        //restart
     }
-    
-    
-    
-    
-    
 }
 
 
@@ -330,7 +323,7 @@ void ofApp::draw(){
     
     ofSetColor(255);
     ofDrawBitmapString(loseMovie.getPosition(), 50, 100);
-    ofDrawBitmapString(scoreMovie.getPosition(), 50, 150);
+    ofDrawBitmapString(backgroundGameSound.getPosition(), 50, 150);
     ofDrawBitmapString(game_state, 50, 200);
     //ofDrawBitmapString(secondCharacter, 50, 130);
     //ofDrawBitmapString(ofToString(test), 50, 150);
@@ -354,17 +347,11 @@ void ofApp::draw(){
         
     }else if (game_state == "game") {
 
-        
         for (int i = 0; i < lightballs.size(); i++) {
             lightballs[i].draw();
         }
-        
-        if(level == 1){
-            
-            
-        }else if(level == 2){
-            
-        }else if(level == 3){
+    
+        if(level == 3){
             ofEnableAlphaBlending();
             ofSetColor(0,0,0,opacity);
             ofDrawRectangle(nulPos.x, nulPos.y, width, height);
@@ -452,12 +439,6 @@ void ofApp::keyPressed(int key){
     
 
     if(game_state == "game"){
-        /*if(key == ' '){
-            lightball l;
-            int colorIndex = ofRandom(5)-1;
-            l.setup(colors[colorIndex][0],colors[colorIndex][1],colors[colorIndex][2] ,1, 1, nulPos.x + width, ofRandom(nulPos.y ,nulPos.y + height), colorIndex);
-            lightballs.push_back(l);
-        }*/
         
         if(key == 'a'){
             players[0].pos.y -= 10;
@@ -532,9 +513,12 @@ void ofApp::reset_game(){
     
     pickLevelMovie.load("movies/pickLevel.mp4");
     
-    
+    scoreMovie.load("movies/score.mp4");
+    loseMovie.load("movies/lose.mp4");
     
     game_state = "start";
+    
+    backgroundGameSound.setVolume(0.5);
 }
 
 //--------------------------------------------------------------
@@ -914,3 +898,5 @@ void ofApp:: update_feedbackMovies(){
         }
     
 }
+
+

@@ -38,6 +38,8 @@ public:
     void update_opacity();
     void draw_feedbackMovies();
     void update_feedbackMovies();
+
+    
     
     int test = 0;
     
@@ -97,6 +99,7 @@ public:
     
     ofTrueTypeFont font;
     
+    ofSoundPlayer backgroundGameSound;
     
     //img
     ofImage pickLevelImg;
