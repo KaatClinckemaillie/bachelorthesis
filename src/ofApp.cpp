@@ -8,7 +8,9 @@ void ofApp::setupVideo(){
     //load media
     introMovie.load("movies/intro.mp4");
     flicker1Movie.load("movies/flicker1.mp4");
+    flicker2Movie.load("movies/flicker2.mp4");
     endscoreMovie.load("movies/endscoreScreen.mp4");
+    outroMovie.load("movies/outro.mp4");
     
 }
 
@@ -30,7 +32,7 @@ void ofApp::updateVideo(ofEventArgs & args){
             
             
         }
-     }else if(game_state == "levelUp"){
+     }else if(game_state == "flicker"){
         if(level == 2){
             flicker1Movie.play();
             flicker1Movie.update();
@@ -43,8 +45,14 @@ void ofApp::updateVideo(ofEventArgs & args){
         
         if(level == 3){
             flicker1Movie.close();
-            game_state = "game";
+
+            flicker2Movie.play();
+            flicker2Movie.update();
             
+            if(flicker2Movie.getPosition() >= 0.95){
+                flicker2Movie.stop();
+                game_state = "game";
+            }
         }
      }else if(game_state == "outro"){
          // video outro
@@ -62,9 +70,7 @@ void ofApp::updateVideo(ofEventArgs & args){
          }
      }
         
-        if(level == 3){
-            flicker1Movie.close();
-        }
+    
 }
 
 //--------------------------------------------------------------
@@ -78,10 +84,15 @@ void ofApp::drawVideo(ofEventArgs & args){
         ofSetColor(255);
         introMovie.draw(0, 0, ofGetWidth(), ofGetWidth() * 9 / 16);
         
-    } else if (game_state == "levelUp") {
+    } else if (game_state == "flicker" || game_state == "game") {
         ofSetColor(255);
-        flicker1Movie.draw(0, 0, ofGetWidth(), ofGetWidth() * 9 / 16);
         
+        if(level == 2){
+            flicker1Movie.draw(0, 0, ofGetWidth(), ofGetWidth() * 9 / 16);
+        }
+        if(level == 3){
+            flicker2Movie.draw(0, 0, ofGetWidth(), ofGetWidth() * 9 / 16);
+        }
     
     } else if (game_state == "score") {
         ofSetColor(255);
@@ -108,7 +119,10 @@ void ofApp::setup(){
     
     
     pickLevelMovie.load("movies/pickLevel.mp4");
-    levelUpImg.load("images/levelUp.png");
+    levelUpMovie.load("movies/levelUp.mp4");
+    
+    endMovie.load("movies/end.mp4");
+    
     
     //endscoreProjectionMovie.load("movies/endscoreProjection.mp4");
     
@@ -232,17 +246,8 @@ void ofApp::update(){
             
         }
         
-        
         if(level == 1){
-            if(catched_lightballs == 10) {
-                // start animation
-                
-                level == 2;
-            }
-            
-            
-            
-            
+
         }else if(level == 2){
             float now = ofGetElapsedTimef();
             if(now > nextLightballSeconds) {
@@ -272,9 +277,24 @@ void ofApp::update(){
         update_lightballs();
         
 
+    }else if(game_state == "levelUp"){
+        
+        levelUpMovie.update();
+        
+        if(levelUpMovie.getPosition() >= 0.95){
+            levelUpMovie.setPaused(true);
+            game_state = "flicker";
+        }
+        
     }else if(game_state == "end") {
-        // play animation of happy lightman, confetti party
-        // animation done? play outro
+        
+        endMovie.play();
+        endMovie.update();
+        
+        if(endMovie.getPosition() >= 0.9){
+            endMovie.setPaused(true);
+            game_state = "outro";
+        }
         
         
     }else if(game_state == "score"){
@@ -298,10 +318,11 @@ void ofApp::draw(){
     ofDrawRectangle(nulPos.x, nulPos.y, width, height);
     
     ofSetColor(255);
-    ofDrawBitmapString(positions, 50, 100);
-    ofDrawBitmapString(firstCharacter, 1000, 520);
-    ofDrawBitmapString(secondCharacter, 50, 130);
-    ofDrawBitmapString(ofToString(test), 50, 150);
+    ofDrawBitmapString(loseMovie.getPosition(), 50, 100);
+    ofDrawBitmapString(scoreMovie.getPosition(), 50, 150);
+    ofDrawBitmapString(game_state, 50, 200);
+    //ofDrawBitmapString(secondCharacter, 50, 130);
+    //ofDrawBitmapString(ofToString(test), 50, 150);
     //ofDrawBitmapString(players[0].pos.y, 50, 200);
     //ofDrawBitmapString(players[1].pos.y, 50, 210);
     
@@ -311,32 +332,17 @@ void ofApp::draw(){
     if(game_state=="start"){
         //ofDrawBitmapString("Pick your level", 1000, 500);
         ofSetColor(255);
-        int size_x = 782;
-        int size_y = 1080;
-        pickLevelMovie.draw(width + nulPos.x - 400 , nulPos.y + height/2 - size_y/2, size_x, size_y);
+        pickLevelMovie.draw(nulPos.x + width - sizeVideoWidth , nulPos.y + height/2 - sizeVideoHeight/2, sizeVideoWidth, sizeVideoHeight);
         
     }else if (game_state == "introGame") {
         ofSetColor(255);
         introLightmanMovie.draw(width/2 + nulPos.x, 0 + nulPos.y, 800, 800);
     }else if (game_state == "countdown") {
         ofSetColor(255);
-        
-        countdownMovie.draw(width/2 + nulPos.x, nulPos.y, 782, 1080);
+        countdownMovie.draw(nulPos.x + width - sizeVideoWidth , nulPos.y + height/2 - sizeVideoHeight/2, sizeVideoWidth, sizeVideoHeight);
         
     }else if (game_state == "game") {
-        //draw score
-        ofDrawBitmapString("Score:",1500, 50);
-        ofDrawBitmapString(ofToString(score), 1550, 50);
-        ofDrawBitmapString("Catched lightballs:",1500, 70);
-        ofDrawBitmapString(ofToString(catched_lightballs),1750, 70);
-        ofDrawBitmapString("Level:",1500, 80);
-        ofDrawBitmapString(ofToString(level), 1550, 80);
-        
-        
-        //draw lightman
-        draw_lightman();
-        
-        draw_feedbackMovies();
+
         
         for (int i = 0; i < lightballs.size(); i++) {
             lightballs[i].draw();
@@ -354,17 +360,25 @@ void ofApp::draw(){
             ofDisableAlphaBlending();
         }
         
-    } else if (game_state == "levelUp") {
+        
+        //draw lightman
+        draw_lightman();
+        draw_feedbackMovies();
+        
+        
+    } else if (game_state == "levelUp" || game_state == "flicker") {
         ofSetColor(255);
-        int size_x = 589;
-        int size_y = 862;
-        levelUpImg.draw(width + nulPos.x - 600 , nulPos.y + height/2 - size_y/2, size_x, size_y);
+        int size_x = 782;
+        int size_y = 1080;
+        levelUpMovie.draw(nulPos.x + width - sizeVideoWidth , nulPos.y + height/2 - sizeVideoHeight/2, sizeVideoWidth, sizeVideoHeight);
     }
-    
-    
     
     for (int i = 0; i < players.size(); i++) {
         players[i].draw();
+    }
+    
+    if(game_state == "end" || game_state == "outro"){
+        endMovie.draw(nulPos.x, nulPos.y, width, height);
     }
     
     
@@ -547,13 +561,31 @@ void ofApp::add_lightball(){
 
 //--------------------------------------------------------------
 void ofApp::update_players(){
-    int marge = 40;
+    int marge = 50;
+    
     for (int i = 0; i < players.size(); i++) {
-        int num = floor((ofToInt(positions.substr(i * 2, 2)) * height)/ float(heightTable));
+        
+        // substract de numbers from string + mirror
+        int getPosition = maxPosSensor + minPosSensor - ofToInt(positions.substr(i * 2, 2));
+        
+        // correct ratio
+        int num = floor((getPosition * height)/ float(maxPosSensor));
+        
+        
+        if(num < minPosSensor){
+            num = minPosSensor + players[i].radius;
+        }else if(num > maxPosSensor){
+            num = maxPosSensor - players[i].radius;
+        }
+        
+        
+        
         
         // check if big difference, yes: change position, no: stay the same
         // to avoid 'flickering'
         if(num > players[i].pos.y + marge || num < players[i].pos.y - marge) {
+            
+            
             int newPosition = num + nulPos.y;
             
             if(newPosition + players[i].radius > nulPos.y + height ){
@@ -629,7 +661,7 @@ void ofApp::update_score(int indexPlayer, int indexLightball){
         catched_lightballs ++;
         
         //add light to ledstrip
-        serial.writeByte('d');
+        serial.writeByte('e');
         
         // if still level 1, add lightball
         if(catched_lightballs <= 9){
@@ -653,7 +685,7 @@ void ofApp::update_score(int indexPlayer, int indexLightball){
         catched_lightballs ++;
         
         //add light to ledstrip
-        serial.writeByte('e');
+        serial.writeByte('f');
         
         
         if(catched_lightballs <= 9){
@@ -692,34 +724,34 @@ void ofApp::update_level(){
         serial.writeByte('a');
         level = 2;
         game_state = "levelUp";
-        //stop animations
-        if(scoreMovie.isPlaying()){
-            scoreMovie.stop();
-            scoreMovie.setPosition(0.01);
-        }
         
-        if(loseMovie.isPlaying()){
-            loseMovie.stop();
-            loseMovie.setPosition(0.01);
-        }
+        scoreMovie.setPaused(true);
+        scoreMovie.setPosition(0.1);
+        
+        loseMovie.setPaused(true);
+        loseMovie.setPosition(0.1);
+        
+        levelUpMovie.setPosition(0.1);
+        levelUpMovie.play();
+
         
     }else if(catched_lightballs == 20){
         serial.writeByte('b');
         level = 3;
         game_state = "levelUp";
         
-        if(scoreMovie.isPlaying()){
-            scoreMovie.stop();
-            scoreMovie.setPosition(0.01);
-        }
+        scoreMovie.setPaused(true);
+        scoreMovie.setPosition(0.1);
         
-        if(loseMovie.isPlaying()){
-            loseMovie.stop();
-            loseMovie.setPosition(0.01);
-        }
+        loseMovie.setPaused(true);
+        loseMovie.setPosition(0.1);
+        
+        levelUpMovie.setPosition(0.1);
+        levelUpMovie.play();
+    
         
     }else if(catched_lightballs == 30){
-        game_state = "score";
+        game_state = "end";
         
         scoreMovie.close();
         loseMovie.close();
@@ -851,8 +883,8 @@ void ofApp:: update_feedbackMovies(){
         if(scoreMovie.isPlaying()){
             scoreMovie.update();
             
-            if(scoreMovie.getPosition() >= 0.8){
-                scoreMovie.stop();
+            if(scoreMovie.getPosition() >= 0.8 || game_state != "game"){
+                scoreMovie.setPaused(true);
                 scoreMovie.setPosition(0.01);
             }
         }
@@ -860,8 +892,8 @@ void ofApp:: update_feedbackMovies(){
         if(loseMovie.isPlaying()){
             loseMovie.update();
             
-            if(loseMovie.getPosition() >= 0.8){
-                loseMovie.stop();
+            if(loseMovie.getPosition() >= 0.8 || game_state != "game"){
+                loseMovie.setPaused(true);
                 loseMovie.setPosition(0.01);
             }
         }

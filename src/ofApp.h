@@ -42,14 +42,20 @@ public:
     int test = 0;
     
     //technical setup
-    int heightTable = 38;
+    int maxPosSensor = 47;
+    int minPosSensor = 4;
     
     
     //game setup
     int width = 1920;
     int height = 1080;
+    
+    int sizeVideoWidth = 782;
+    int sizeVideoHeight = 1080;
+    
+    
     ofPoint nulPos;
-    string game_state; // start introVideo introGame countdown game levelUp end outro score
+    string game_state; // start introVideo introGame countdown game levelUp flicker end outro score
     
     int score = 0;
     int speed_nextLightball;
@@ -79,11 +85,16 @@ public:
     ofVideoPlayer sadLightmanMovie;
     ofVideoPlayer neutralLightmanMovie;
     ofVideoPlayer flicker1Movie;
+    ofVideoPlayer flicker2Movie;
     ofVideoPlayer scoreMovie;
     ofVideoPlayer loseMovie;
     ofVideoPlayer pickLevelMovie;
-    ofVideoPlayer endscoreProjectionMovie;
+    ofVideoPlayer endMovie;
     ofVideoPlayer endscoreMovie;
+    ofVideoPlayer levelUpMovie;
+    ofVideoPlayer outroMovie;
+    
+    
     //img
     ofImage pickLevelImg;
     ofImage levelUpImg;
