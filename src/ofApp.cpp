@@ -338,7 +338,7 @@ void ofApp::draw(){
         
     }else if (game_state == "introGame") {
         ofSetColor(255);
-        introLightmanMovie.draw(width/2 + nulPos.x, 0 + nulPos.y, 800, 800);
+        introLightmanMovie.draw(nulPos.x + width - sizeVideoWidth , nulPos.y + height/2 - sizeVideoHeight/2, sizeVideoWidth, sizeVideoHeight);
     }else if (game_state == "countdown") {
         ofSetColor(255);
         countdownMovie.draw(nulPos.x + width - sizeVideoWidth , nulPos.y + height/2 - sizeVideoHeight/2, sizeVideoWidth, sizeVideoHeight);
@@ -501,6 +501,9 @@ void ofApp::reset_game(){
     introMovie.load("movies/intro.mp4");
     flicker1Movie.load("movies/flicker1.mp4");
     endscoreMovie.load("movies/endscoreScreen.mp4");
+    outroMovie.load("movies/outro.mp4");
+    
+    endMovie.setPosition(0.1);
     
     introLightmanMovie.load("movies/introLightman.mp4");
     countdownMovie.load("movies/countdown.mp4");
@@ -514,6 +517,8 @@ void ofApp::reset_game(){
     
     scoreMovie.load("movies/score.mp4");
     loseMovie.load("movies/lose.mp4");
+    
+    
     
     game_state = "start";
     
