@@ -8,7 +8,7 @@ int main( ){
     
     //size of laptop/beamer screen
     //beamer: 1980 x 1080
-    settings.setSize(1024, 768);
+    settings.setSize(1980, 1080);
     settings.setPosition(glm::vec2(300,0));
     settings.resizable = true;
     auto mainWindow = ofCreateWindow(settings);

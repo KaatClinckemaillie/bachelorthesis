@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
-#include "Lightbol.h"
+#include "Lightball.h"
 #include "Player.h"
 
 
@@ -22,9 +22,9 @@ public:
     void mousePressed(int x, int y, int button);
     void windowResized(int w, int h);
     
-    void update_lightbols();
-    void check_lightbols_collision();
-    void add_lightbol();
+    void update_lightballs();
+    void check_lightballs_collision();
+    void add_lightball();
     void update_players();
     int round_position(float num);
     void setup_game();
@@ -33,28 +33,49 @@ public:
     void update_lightman();
     void stop_lightmanMovies();
     void reset_game();
+    void check_position_lightballs();
+    void update_score(int indexPlayer, int indexLightball);
+    void update_opacity();
+    void draw_feedbackMovies();
+    void update_feedbackMovies();
 
     
     
+    string test = "test";
+    
     //technical setup
-    int heightTable = 40;
+    int maxPosSensor = 47;
+    int minPosSensor = 4;
     
     
     //game setup
     int width = 1920;
     int height = 1080;
+    
+    int sizeVideoWidth = 782;
+    int sizeVideoHeight = 1080;
+    
+    
     ofPoint nulPos;
-    string game_state; // start introVideo introGame countdown game end outro restart
+    string game_state; // start introVideo introGame countdown game levelUp flicker end outro score
     
     int score = 0;
     int speed_nextLightball;
+    int speed_lightballs;
     int catched_lightballs = 0;
     int throwed_lightballs = 0;
-    float nextLightbolSeconds = 0;
+    float nextLightballSeconds = 0;
     int level;
     int game_mode; //easy medium hard
     string state_lightman = "neutral"; // neutral happy sad;
+    string endScore;
+
+    int opacity = 255;
+    bool increaseOpacity = false;
     
+    
+    int playerIndex; // index of player that scored/missed
+    ofPoint positionHit;
     
     //media
     //video
@@ -66,8 +87,23 @@ public:
     ofVideoPlayer happyLightmanMovie;
     ofVideoPlayer sadLightmanMovie;
     ofVideoPlayer neutralLightmanMovie;
+    ofVideoPlayer flicker1Movie;
+    ofVideoPlayer flicker2Movie;
+    ofVideoPlayer scoreMovie;
+    ofVideoPlayer loseMovie;
+    ofVideoPlayer pickLevelMovie;
+    ofVideoPlayer endMovie;
+    ofVideoPlayer endscoreMovie;
+    ofVideoPlayer levelUpMovie;
+    ofVideoPlayer outroMovie;
+    
+    ofTrueTypeFont font;
+    
+    ofSoundPlayer backgroundGameSound;
+    
     //img
-    ofImage arrow;
+    ofImage pickLevelImg;
+    ofImage levelUpImg;
 
     
     
@@ -91,12 +127,12 @@ public:
     
     vector <int> bytesData;
     
-    vector <Lightbol> lightbols;
+    vector <Lightball> lightballs;
     vector <Player> players;
     
     // colors of the sticks and bolls
     // yellow , green, blue, pink
-    int colors[4][3] = {{245, 215, 64},{1, 157, 89},{20, 37, 234},{253, 175, 221}};
+    int colors[4][3] = {{245, 215, 63},{1, 157, 89},{20, 37, 234},{253, 175, 221}};
     
     // hangt van de stokken van de tafel af
     int x_positions[4] = {151, 453, 755, 1057};
